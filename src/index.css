@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Montserrat', sans-serif;
+}
+
+
+/* src/index.css */
+
+@theme {
+  /* Definimos una variable para títulos (Display).
+     'Kanit' es la fuente principal, sans-serif es el respaldo (fallback) 
+     si la primera no carga. 
+  */
+  --font-display: 'Kanit', sans-serif;
+
+  /* Definimos una variable para el texto corrido (Body).
+     Montserrat es muy legible para descripciones de figuras y precios.
+     <h1 className="font-display font-bold text-3xl">Goku Ultra Instinto</h1>
+     <p className="font-body text-gray-600">Figura de acción articulada...</p>
+  */
+  --font-body: 'Montserrat', sans-serif;
+}
+
+@layer components {
+  /* Aquí personalizamos Swiper para que sea parte de nuestro sistema de diseño */
+  .swiper-button-next, 
+  .swiper-button-prev {
+    @apply text-white scale-75; /* ¡Puedes usar @apply para usar Tailwind dentro del CSS! */
+  }
+
+  .swiper-pagination-bullet-active {
+    @apply bg-orange-500;
+  }
+}

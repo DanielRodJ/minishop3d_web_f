@@ -1,0 +1,1 @@
+// COmponente para mostrar la galeria de un producto, como en MercadoLibre, con una imagen grande y varias miniaturas debajo para cambiar la imagen principal.
