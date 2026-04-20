@@ -12,7 +12,7 @@ export const addProductoAsync = async (
   data: AddProductCommand
 ): Promise<AddProductResponse> => {
 
-  const response = await api.private(`/minisho3d/product`, {
+  const response = await api.private(`/minisho3d/producto`, {
     method: "POST",
     body: JSON.stringify(data)
   });
@@ -39,7 +39,7 @@ export const getProductosAsync = async (
     query.append("sortDescending", params.sortDescending.toString());
 
   const response = await api.private(
-    `/minisho3d/product/products?${query.toString()}`
+    `/minisho3d/producto/productos?${query.toString()}`
   );
 
   if (!response.ok) {
