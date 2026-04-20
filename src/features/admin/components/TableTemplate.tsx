@@ -26,7 +26,7 @@ export function Table<T>({ columns, data, onPageChange }: TablaProps<T>) {
               {columns.map((col, i) => (
                 <th
                   key={i}
-                  className="px-4 py-3 text-left font-bold text-gray-900 uppercase tracking-wider"
+                  className="px-4 py-3 text-center font-bold text-gray-900 uppercase tracking-wider"
                 >
                   {col.header}
                 </th>
@@ -49,11 +49,13 @@ export function Table<T>({ columns, data, onPageChange }: TablaProps<T>) {
                 <tr key={i} className="hover:bg-gray-50">
                   {columns.map((col, j) => (
                     <td key={j} className="px-4 py-3">
-                      {col.render
-                        ? col.render(fila)
-                        : col.key
-                          ? (fila[col.key] as any)
-                          : null}
+                      <div className="flex justify-center">
+                        {col.render
+                          ? col.render(fila)
+                          : col.key
+                            ? (fila[col.key] as any)
+                            : null}
+                      </div>
                     </td>
                   ))}
                 </tr>
@@ -63,7 +65,7 @@ export function Table<T>({ columns, data, onPageChange }: TablaProps<T>) {
         </table>
       </div>
 
-      {/* 🔹 Paginación */}
+      {/* Paginación */}
       <div className="flex justify-between items-center text-sm">
         <span>
           Página {data.pageNumber} de {data.totalPages}
