@@ -60,7 +60,8 @@ const buttonPresets: Record<string, ButtonPresetConfig> = {
     shoppingCart: {
         text: "Agregar",
         variant: "shopping",
-        Icon: ShoppingCartIcon
+        Icon: ShoppingCartIcon,
+        className: "px-3"
     },
     delete: {
         text: "Eliminar",
