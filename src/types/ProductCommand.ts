@@ -1,4 +1,4 @@
-export interface AddProductCommand {
+export interface AddProductoCommand {
   nombreProducto: string;
   descripcionProducto: string;
   escalaBase: string;
@@ -9,6 +9,6 @@ export interface AddProductCommand {
   coleccionId?: number;
 }
 
-export interface UpdateProductCommand extends AddProductCommand {
+export interface UpdateProductoCommand extends AddProductoCommand {
   productoId: number;
 }
