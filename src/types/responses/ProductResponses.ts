@@ -14,4 +14,5 @@ export type ProductoBaseDto = {
 };
 
 
-export type ProductResponse = BasePagedDto<ProductoBaseDto>;
+export type ProductosResponse = BasePagedDto<ProductoBaseDto>;
+export type ProductoResponse = ProductoBaseDto;
