@@ -1,15 +1,26 @@
 // service
 import { api } from "../../../services/ApiClient";
-import type { AddProductCommand } from "../../../types/ProductCommand";
+import type { AddProductoCommand, UpdateProductoCommand } from "../../../types/ProductCommand";
 import type { BaseQueryParams } from "../../../types/BaseQueryParams";
-import type { ProductResponse } from "../../../types/responses/ProductResponses";
+import type { ProductoResponse, ProductosResponse } from "../../../types/responses/ProductResponses";
 
 export type AddProductResponse = {
   productId: number;
 };
 
+export const getProductoAsync = async (id: number) => {
+  const response = await api.private(`/minisho3d/producto/${id}`);
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || "Error al obtener el producto");
+  }
+
+  return response.json() as Promise<ProductoResponse>;
+}
+
 export const addProductoAsync = async (
-  data: AddProductCommand
+  data: AddProductoCommand
 ): Promise<AddProductResponse> => {
 
   const response = await api.private(`/minisho3d/producto`, {
@@ -25,9 +36,25 @@ export const addProductoAsync = async (
   return response.json() as Promise<AddProductResponse>;
 };
 
+export const updateProductoAsync = async (
+  data: UpdateProductoCommand
+): Promise<UpdateProductoCommand> => {
+  const response = await api.private(`/minisho3d/producto/${data.productoId}`, {
+    method: "PUT",
+    body: JSON.stringify(data)
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || "Error al actualizar el producto");
+  }
+
+  return response.json() as Promise<UpdateProductoCommand>;
+};
+
 export const getProductosAsync = async (
   params?: BaseQueryParams
-): Promise<ProductResponse> => {
+): Promise<ProductosResponse> => {
   const query = new URLSearchParams();
 
   if (params?.pageNumber) query.append("pageNumber", params.pageNumber.toString());
@@ -47,5 +74,5 @@ export const getProductosAsync = async (
     throw new Error(errorText || "Error al obtener productos");
   }
 
-  return response.json() as Promise<ProductResponse>;
+  return response.json() as Promise<ProductosResponse>;
 };
