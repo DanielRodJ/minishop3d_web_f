@@ -1,5 +1,5 @@
 import type { Character } from '../types/ProductType';
-import { ButtonShoppingCart } from './ui/Buttons';
+import { ButtonCustom } from './ui/Buttons';
 
 interface Props {
   item: Character;
@@ -22,7 +22,7 @@ export const CardMiniature = ({ item }: Props) => {
           )}
         </div>
       </div>
-      <ButtonShoppingCart className="mx-auto mt-4" onClick={() => alert(`Agregando al carrito: ${item.characterName}`)} disabled={!item.disponibility} />  
+      <ButtonCustom preset="shoppingCart" className="mx-auto mt-4" onClick={() => alert(`Agregando al carrito: ${item.characterName}`)} disabled={!item.disponibility} />  
     </div>
   );
 };
