@@ -29,6 +29,7 @@ export const InputBase = ({
     return (
         <input
             {...props}
+            value={props.value ?? ""}
             className={`
         w-full rounded-md border text-gray-500
         focus:outline-none focus:ring-1 focus:border-transparent
