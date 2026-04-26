@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getProductosAsync, getProductoAsync } from "../services/ProductApi";
+import { getProductosAsync, getProductoAsync } from "../services/ProductoApi";
 import type { ProductosResponse, ProductoResponse } from "../../../types/responses/ProductResponses";
 import { AuthError } from "../../../errors/AuthError";
 import { useNavigate } from "react-router-dom";

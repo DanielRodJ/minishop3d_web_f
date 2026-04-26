@@ -6,7 +6,7 @@ import type {
 import {
   addProductoAsync,
   updateProductoAsync
-} from "../services/ProductApi";
+} from "../services/ProductoApi";
 
 /* =========================================================
    Base

@@ -1,4 +1,5 @@
-// service
+// src/features/admin/services/ProductoApi.ts
+
 import { api } from "../../../services/ApiClient";
 import type { AddProductoCommand, UpdateProductoCommand } from "../../../types/ProductCommand";
 import type { BaseQueryParams } from "../../../types/BaseQueryParams";
