@@ -3,7 +3,7 @@
 import { api } from "../../../services/ApiClient";
 import type { AddProductoCommand, UpdateProductoCommand } from "../../../types/ProductCommand";
 import type { BaseQueryParams } from "../../../types/BaseQueryParams";
-import type { ProductoResponse, ProductosResponse } from "../../../types/responses/ProductResponses";
+import type { ProductoDetalladoResponse, ProductosResponse } from "../../../types/responses/ProductResponses";
 
 export type AddProductResponse = {
   productId: number;
@@ -17,7 +17,7 @@ export const getProductoAsync = async (id: number) => {
     throw new Error(errorText || "Error al obtener el producto");
   }
 
-  return response.json() as Promise<ProductoResponse>;
+  return response.json() as Promise<ProductoDetalladoResponse>;
 }
 
 export const addProductoAsync = async (

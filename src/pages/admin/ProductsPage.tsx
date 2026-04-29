@@ -1,11 +1,12 @@
+// src/pages/admin/ProductsPage.tsx
+
 import { FiltersComponent } from "../../features/admin/components/FiltersComponent";
 import { SearchBarTable } from "../../components/shared/SearchBarComponents";
 import { ButtonCustom } from "../../components/ui/Buttons";
 import { Table, type Column } from "../../features/admin/components/TableTemplate";
 import { useState } from "react";
 import { FormProducto } from "../../features/admin/components/FormsProduct";
-import type { ProductoBaseDto } from "./../../types/responses/ProductResponses";
-import type { ProductoResponse } from "../../types/responses/ProductResponses";
+import type { ProductoBaseDto, ProductoDetalladoResponse } from "./../../types/responses/ProductResponses";
 import type { UpdateProductoCommand } from "../../types/ProductCommand";
 import { useProductos } from "../../features/admin/hooks/useProductos";
 import {
@@ -22,7 +23,7 @@ export const ProductosPage = () => {
 
   const columns = [
     { header: "ID", key: "productoId" },
-    { header: "Nombre", key: "nombre" },
+    { header: "Nombre", key: "nombreProducto" },
     {
       header: "Colección",
       render: (p: ProductoBaseDto) => p.coleccion?.nombre ?? "—"
@@ -72,25 +73,25 @@ export const ProductosPage = () => {
   } = useProductos();
 
   /* =========================================================
-     🔹 Mapper DTO → Command
+   Mapper DTO → Command
   ========================================================= */
 
   const mapProductoToCommand = (
-    p: ProductoResponse
+    p: ProductoDetalladoResponse
   ): UpdateProductoCommand => ({
     productoId: p.productoId,
-    nombreProducto: p.nombre,
-    descripcionProducto: "2",
-    escalaBase: "2",
-    costoProduccionBase: 2,
-    filamentoUsoBase: 2,
+    nombreProducto: p.nombreProducto,
+    descripcionProducto: p.descripcionProducto,
+    escalaBase: p.escalaBase,
+    costoProduccionBase: p.costoProduccionBase,
+    filamentoUsoBase: p.filamentoUsoBase,
     autorNombre: p.autorNombre ?? undefined,
     fechaLanzamiento: p.fechaLanzamiento,
     coleccionId: p.coleccionId ?? undefined
   });
 
   /* =========================================================
-     🔹 Forms (hooks)
+   Forms (hooks)
   ========================================================= */
 
   const addForm = useAddProductoForm({
@@ -126,7 +127,7 @@ export const ProductosPage = () => {
   });
 
   /* =========================================================
-     🔹 Handlers
+   Handlers
   ========================================================= */
 
   const handleFilters = () => {
@@ -149,7 +150,7 @@ export const ProductosPage = () => {
   };
 
   /* =========================================================
-     🔹 Render
+   Render
   ========================================================= */
 
   return (
@@ -182,7 +183,7 @@ export const ProductosPage = () => {
 
       <FiltersComponent filtersAreOpen={areFiltersOpen} />
 
-      {/* 🟢 ADD */}
+      {/* ADD */}
       {isAddRecordFormOpen && (
         <FormProducto
           mod="add"
@@ -193,7 +194,7 @@ export const ProductosPage = () => {
         />
       )}
 
-      {/* 🔵 UPDATE */}
+      {/* UPDATE */}
       {isModifyRecordFormOpen && producto && (
         <FormProducto
           mod="update"

@@ -1,13 +1,15 @@
+// src/features/admin/hooks/useProductos.ts
+
 import { useEffect, useState } from "react";
 import { getProductosAsync, getProductoAsync } from "../services/ProductoApi";
-import type { ProductosResponse, ProductoResponse } from "../../../types/responses/ProductResponses";
+import type { ProductosResponse, ProductoDetalladoResponse } from "../../../types/responses/ProductResponses";
 import { AuthError } from "../../../errors/AuthError";
 import { useNavigate } from "react-router-dom";
 
 export const useProductos = () => {
 
   const navigate = useNavigate();
-  const [producto, setProducto] = useState<ProductoResponse | null>(null);
+  const [producto, setProducto] = useState<ProductoDetalladoResponse | null>(null);
   const [productos, setProductos] = useState<ProductosResponse | null>(null);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
