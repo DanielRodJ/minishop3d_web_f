@@ -145,7 +145,9 @@ export const ProductosPage = () => {
 
   const handleOpenModifyRecordForm = async (id: number) => {
     setSelectedProductoId(id);
-    await refetchProducto(id);
+    if (!producto || producto.productoId !== id) {
+      await refetchProducto(id);
+    }
     setModifyRecordFormOpen(true);
   };
 
