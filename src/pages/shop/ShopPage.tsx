@@ -1,9 +1,7 @@
-import type { Character } from "../../types/ProductType";
-import { Footer } from "../../components/shared/Footer";
-import { Navbar } from "../../components/shared/Navbar";
-import HeroCarousel from "../../components/shared/HeroCarousel";
-import ProductSection from "../../components/ProductSection";
-import miniatureSample from '../../assets/miniature_sample.webp';
+import type { Character } from "@/types/ProductType";
+import HeroCarousel from "@/components/shared/HeroCarousel";
+import ProductSection from "@/components/ProductSection";
+import miniatureSample from '@/assets/miniature_sample.webp';
 
 function ShopPage() {
 
@@ -63,18 +61,11 @@ function ShopPage() {
 
   return (
     <>
-      <Navbar />
-      <main className="bg-zinc-950">
-        <HeroCarousel />
-        
-        {/* Aquí maquetamos la sección completa pasando el objeto dentro de un array */}
-        <ProductSection 
-          products={[sampleCharacter, sampleCharacter2, sampleCharacter3]} 
-          title="Novedades de la Semana" 
-        />
-
-      </main>
-      <Footer />
+      <HeroCarousel />
+      <ProductSection
+        products={[sampleCharacter, sampleCharacter2, sampleCharacter3]}
+        title="Novedades de la Semana"
+      />
     </>
   );
 }

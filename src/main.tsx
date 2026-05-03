@@ -1,16 +1,24 @@
-import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { AdminLayout } from './layouts/AdminLayout';
-import { HomePage } from './pages/admin/HomePage';
-import { ProductosPage } from './pages/admin/ProductsPage';
-import { temporal as LoginPage } from './pages/auth/LoginPage';
+// src/main.tsx
 
-import './index.css'
-import { ProtectedRoute } from './components/shared/ProtectedRoute';
-import ErrorPage from './pages/auth/ErrorPage';
-import { AuthProvider } from './context/AuthContext';
-import ShopPage from './pages/shop/ShopPage';
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
+
+import { AdminLayout } from "@/layouts/AdminLayout";
+import { ShopLayout } from "@/layouts/ShopLayout";
+
+import { HomePage } from "@/pages/admin/HomePage";
+import { ProductosPage } from "@/pages/admin/ProductsPage";
+import { temporal as LoginPage } from "@/pages/auth/LoginPage";
+import ErrorPage from "@/pages/auth/ErrorPage";
+import ShopPage from "@/pages/shop/ShopPage";
+import PostDetailPage from "@/pages/shop/PostDetailPage";
+
+import { ProtectedRoute } from "@/components/shared/ProtectedRoute";
+
+import { AuthProvider } from "@/context/AuthContext";
+
+import "@/index.css";
 
 const router = createBrowserRouter([
   {
@@ -19,7 +27,12 @@ const router = createBrowserRouter([
   },
   {
     path: "/shop",
-    element: <ShopPage />,
+    element: <ShopLayout />,
+    errorElement: <ErrorPage />,
+    children: [
+      { index: true, element: <ShopPage /> },
+      { path: ":postId", element: <PostDetailPage /> },
+    ],
   },
   {
     element: <ProtectedRoute adminRole={true} />,
@@ -36,21 +49,15 @@ const router = createBrowserRouter([
     ],
   },
   {
-    element: <ProtectedRoute adminRole={false} />,
-    errorElement: <ErrorPage />,
-    children: [
-    ],
-  },
-  {
     path: "/",
-    element: <Navigate to="/shop" />
+    element: <Navigate to="/shop" />,
   },
 ]);
 
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <AuthProvider>
       <RouterProvider router={router} />
     </AuthProvider>
-  </StrictMode>,
-)
+  </StrictMode>
+);
