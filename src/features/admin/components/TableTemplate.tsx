@@ -14,9 +14,15 @@ interface TablaProps<T> {
     totalPages: number;
   };
   onPageChange?: (page: number) => void;
+  getRowId: (fila: T) => React.Key;
 }
 
-export function Table<T>({ columns, data, onPageChange }: TablaProps<T>) {
+export function Table<T>({
+  columns,
+  data,
+  onPageChange,
+  getRowId
+}: TablaProps<T>) {
   return (
     <div className="space-y-3">
       <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-md">
@@ -45,8 +51,8 @@ export function Table<T>({ columns, data, onPageChange }: TablaProps<T>) {
                 </td>
               </tr>
             ) : (
-              data.items.map((fila, i) => (
-                <tr key={i} className="hover:bg-gray-50">
+              data.items.map((fila) => (
+                <tr key={getRowId(fila)} className="hover:bg-gray-50">
                   {columns.map((col, j) => (
                     <td key={j} className="px-4 py-3">
                       <div className="flex justify-center">
