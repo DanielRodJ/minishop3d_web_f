@@ -6,7 +6,8 @@ import {
     ShoppingCartIcon,
     TrashIcon,
     FolderPlusIcon,
-    DocumentArrowDownIcon
+    DocumentArrowDownIcon,
+    QuestionMarkCircleIcon
 } from "@heroicons/react/24/solid";
 
 /* =========================================================
@@ -67,6 +68,12 @@ const buttonPresets: Record<string, ButtonPresetConfig> = {
         text: "Eliminar",
         variant: "ghost",
         Icon: TrashIcon
+    },
+    tableInfo:{
+        text: "",
+        variant: "tableButton",
+        Icon: QuestionMarkCircleIcon,
+        className: "text-blue-500"
     },
     tableModify: {
         text: "Modificar",
