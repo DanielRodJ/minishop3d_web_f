@@ -1,59 +1,81 @@
-import { MagnifyingGlassCircleIcon } from "@heroicons/react/24/solid";
+// src/components/shared/SearchBarComponents.tsx
 
-type SearchBarVariant = "default" | "filter";
+import { MagnifyingGlassCircleIcon } from "@heroicons/react/24/solid";
+import { useEffect, useState } from "react";
+
+type SearchBarVariant = "shopDefault" | "adminFilter";
+
+/* =========================================================
+    Variants
+   ========================================================= */
 
 const variantStyles: Record<SearchBarVariant, string> = {
-    default: "bg-gray-200 border",
-    filter: "bg-blue-100 border-blue-300"
+    shopDefault: "bg-gray-200 border",
+    adminFilter: "bg-blue-100 border-blue-300"
 };
 
-type SearchBarCustomProps = Omit<
-    React.InputHTMLAttributes<HTMLInputElement>,
-    "className"
-> & {
-    variant?: SearchBarVariant;
+/* =========================================================
+    Presets
+   ========================================================= */
+
+type SearchBarPresetConfig = {
+    placeholder: string;
+    variant: SearchBarVariant;
 };
 
-export type SearchBarProps = {
-    placeholder?: string;
-    id?: string;
-    name?: string;
+const searchBarPresets: Record<string, SearchBarPresetConfig> = {
+    searchBarFilter: {
+        placeholder: "Buscar",
+        variant: "adminFilter",
+    },
+    searchBarTable: {
+        placeholder: "Buscar",
+        variant: "shopDefault",
+    }
 }
 
-export const SearchBarFilters = ({
-    placeholder,
-    id = "search-bar-filters",
-    name = "search"
-}: SearchBarProps) => (
-    <SearchBarCustom
-        id={id}
-        name={name}
-        type="search"
-        placeholder={placeholder}
-        variant="filter"
-    />
-);
+type SearchBarPreset = keyof typeof searchBarPresets;
 
-export const SearchBarTable = ({
-    placeholder,
-    id = "search-bar-table",
-    name = "search"
-}: SearchBarProps) => (
-    <SearchBarCustom
-        id={id}
-        name={name}
-        type="search"
-        placeholder={placeholder}
-        variant="default"
-    />
-);
+/* =========================================================
+    Props
+   ========================================================= */
 
-const SearchBarCustom = ({
-    variant = "default",
+interface SearchBarCustomProps
+    extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "className" | "onChange"> {
+    placeholder?: string;
+    variant?: SearchBarVariant;
+    onSearch?: (value: string) => void;
+    preset?: SearchBarPreset;
+    debounceTime?: number;
+}
+
+/* =========================================================
+    Componente base
+   ========================================================= */
+
+export const SearchBarCustom = ({
+    preset,
     placeholder,
-    id,
+    variant = "shopDefault",
+    onSearch,
+    debounceTime = 500,
     ...props
 }: SearchBarCustomProps) => {
+
+    const [searchTerm, setSearchTerm] = useState("");
+
+    const presetConfig = preset ? searchBarPresets[preset] : undefined;
+    const finalPlaceholder = presetConfig?.placeholder ?? placeholder;
+    const finalVariant = presetConfig?.variant ?? variant;
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            if(onSearch) onSearch(searchTerm);
+        }, debounceTime);
+
+        return () => clearTimeout(handler);
+    }, [searchTerm, onSearch, debounceTime]);
+
     return (
         <div className="relative">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -61,12 +83,12 @@ const SearchBarCustom = ({
             </div>
 
             <input
-                id={id}
-                type="search"
-                placeholder={placeholder}
-                aria-label={placeholder || "Search"}
                 {...props}
-                className={`${variantStyles[variant]} w-full rounded-lg pl-10 pr-4 py-1.5 font-body text-sm text-black focus:outline-none focus:ring-1 focus:ring-black`}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className={`w-full rounded-lg pl-10 pr-4 py-1.5 font-body text-sm text-black focus:outline-none focus:ring-1 focus:ring-black ${variantStyles[finalVariant]}`}
+                type="search"
+                placeholder={finalPlaceholder}
             />
         </div>
     );
