@@ -3,12 +3,14 @@
 import { auth } from "./Firebase";
 import { ApiError } from "@/errors/ApiError";
 import { AuthError } from "@/errors/AuthError";
+import { throwApiError } from "@/errors/throwApiError";
 
 const BASE_URL =  import.meta.env.VITE_API_URL;
 
 export const api = {
   public: apiFetchPublic,
-  private: apiFetchPrivate
+  private: apiFetchPrivate,
+  request
 }
 
 async function apiFetch(
@@ -47,4 +49,18 @@ async function apiFetchPrivate(url: string, options: RequestInit = {}) {
     throw new AuthError();
   }
   return apiFetch(url, options, token);
+}
+
+async function request<T>(
+  responsePromise: Promise<Response>,
+  fallback: string
+): Promise<T> {
+
+  const response = await responsePromise;
+
+  if (!response.ok) {
+    await throwApiError(response, fallback);
+  }
+
+  return response.json() as Promise<T>;
 }

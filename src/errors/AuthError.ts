@@ -1,8 +1,10 @@
-// AuthError.ts
+// src/errors/AuthError.ts
 
-export class AuthError extends Error {
+import { ApiError } from "./ApiError";
+
+export class AuthError extends ApiError {
   constructor(message = "No autenticado") {
-    super(message);
+    super({ message, status: 401 });
     this.name = "AuthError";
   }
 }

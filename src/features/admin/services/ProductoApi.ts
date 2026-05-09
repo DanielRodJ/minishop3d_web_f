@@ -1,59 +1,50 @@
 // src/features/admin/services/ProductoApi.ts
 
-import { api } from "../../../services/ApiClient";
-import type { AddProductoCommand, UpdateProductoCommand } from "../../../types/ProductCommand";
-import type { BaseQueryParams } from "../../../types/BaseQueryParams";
-import type { ProductoDetalladoResponse, ProductosResponse } from "../../../types/responses/ProductResponses";
+import { api } from "@/services/ApiClient";
 
-export type AddProductResponse = {
+import type { BaseQueryParams } from "@/types/BaseQueryParams";
+import type { AddProductoCommand, UpdateProductoCommand } from "@/types/ProductCommand";
+import type { ProductoDetalladoResponse, ProductosResponse } from "@/types/responses/ProductResponses";
+
+const BASE_PATH = "/minisho3d/producto";
+
+export type ProductoIdResponse = {
   productId: number;
 };
 
-export const getProductoAsync = async (id: number) => {
-  const response = await api.private(`/minisho3d/producto/${id}`);
+export const getProductoAsync = (id: number) => {
+  return api.request<ProductoDetalladoResponse>(
+    api.private(`${BASE_PATH}/${id}`),
+    "Error al obtener el producto"
+  );
+};
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || "Error al obtener el producto");
-  }
+export const addProductoAsync = (
+  data: AddProductoCommand
+) => {
 
-  return response.json() as Promise<ProductoDetalladoResponse>;
+  return api.request<ProductoIdResponse>(
+    api.private(BASE_PATH, {
+      method: "POST",
+      body: JSON.stringify(data)
+    }),
+    "Error al agregar el producto"
+  );
+};
+
+export const updateProductoAsync = (
+  data: UpdateProductoCommand
+) => {
+  return api.request<boolean>(
+    api.private(`${BASE_PATH}/${data.productoId}`, {
+      method: "PUT",
+      body: JSON.stringify(data)
+    }),
+    "Error al actualizar el producto"
+  )
 }
 
-export const addProductoAsync = async (
-  data: AddProductoCommand
-): Promise<AddProductResponse> => {
-
-  const response = await api.private(`/minisho3d/producto`, {
-    method: "POST",
-    body: JSON.stringify(data)
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || "Error al agregar el producto");
-  }
-
-  return response.json() as Promise<AddProductResponse>;
-};
-
-export const updateProductoAsync = async (
-  data: UpdateProductoCommand
-): Promise<UpdateProductoCommand> => {
-  const response = await api.private(`/minisho3d/producto/${data.productoId}`, {
-    method: "PUT",
-    body: JSON.stringify(data)
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || "Error al actualizar el producto");
-  }
-
-  return response.json() as Promise<UpdateProductoCommand>;
-};
-
-export const getProductosAsync = async (
+export const getProductosAsync = (
   params?: BaseQueryParams
 ): Promise<ProductosResponse> => {
   const query = new URLSearchParams();
@@ -66,14 +57,10 @@ export const getProductosAsync = async (
   if (params?.sortDescending !== undefined)
     query.append("sortDescending", params.sortDescending.toString());
 
-  const response = await api.private(
-    `/minisho3d/producto/productos?${query.toString()}`
+  return api.request<ProductosResponse>(
+    api.private(
+      `${BASE_PATH}/productos?${query.toString()}`
+    ),
+    "Error al obtener productos"
   );
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || "Error al obtener productos");
-  }
-
-  return response.json() as Promise<ProductosResponse>;
 };
