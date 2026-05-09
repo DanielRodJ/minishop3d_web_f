@@ -1,3 +1,5 @@
+// src/features/admin/components/AdminNavigationBar.tsx
+
 import { useState, useRef } from "react";
 import { NavLink } from "react-router-dom";
 
@@ -10,7 +12,13 @@ const items: ItemProps[] = [
     {
         nameItem: "Productos",
         childrens: [
-            { label: "Registrar Producto", path: "/admin/products" },
+            { label: "Administración", path: "/admin/products" },
+        ],
+    },
+    {
+        nameItem: "Publicaciones",
+        childrens: [
+            { label: "Administración", path: "/admin/listings" },
         ],
     }
 ];

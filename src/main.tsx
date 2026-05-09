@@ -8,11 +8,12 @@ import { AdminLayout } from "@/layouts/AdminLayout";
 import { ShopLayout } from "@/layouts/ShopLayout";
 
 import { HomePage } from "@/pages/admin/HomePage";
-import { ProductosPage } from "@/pages/admin/ProductsPage";
+import { ProductsManagementPage } from "@/pages/admin/ProductsManagementPage";
 import { temporal as LoginPage } from "@/pages/auth/LoginPage";
 import ErrorPage from "@/pages/auth/ErrorPage";
 import ShopPage from "@/pages/shop/ShopPage";
-import PostDetailPage from "@/pages/shop/PostDetailPage";
+import PostDetailPage from "@/pages/shop/ListingDetailPage";
+import { ListingsManagementPage } from "@/pages/admin/ListingManagementPage";
 
 import { ProtectedRoute } from "@/components/shared/ProtectedRoute";
 
@@ -43,7 +44,8 @@ const router = createBrowserRouter([
         element: <AdminLayout />,
         children: [
           { index: true, element: <HomePage /> },
-          { path: "products", element: <ProductosPage /> },
+          { path: "products", element: <ProductsManagementPage /> },
+          { path: "listings", element: <ListingsManagementPage /> },
         ],
       },
     ],
