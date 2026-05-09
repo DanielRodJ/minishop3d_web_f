@@ -1,19 +1,52 @@
+// src/features/admin/hooks/useProductosForm.ts
+
 import { useEffect, useState, type ChangeEvent } from "react";
+
+import type { z } from "zod";
+
+import { getErrorMessage, type FieldErrors } from "@/errors/ApiError";
+import { ValidationError } from "@/errors/ValidationError";
+
 import type {
   AddProductoCommand,
   UpdateProductoCommand
-} from "../../../types/ProductCommand";
+} from "@/types/ProductCommand";
+
+import {
+  addProductoSchema,
+  updateProductoSchema
+} from "@/features/admin/schemas/productSchemas";
+
 import {
   addProductoAsync,
   updateProductoAsync
-} from "../services/ProductoApi";
+} from "@/features/admin/services/ProductoApi";
 
-/* =========================================================
-   Base
-   ========================================================= */
+const normalizeFieldName = (field: string) =>
+  field.charAt(0).toLowerCase() + field.slice(1);
+
+const getZodFieldErrors = <T extends object>(
+  error: z.ZodError<T>
+): FieldErrors => {
+  return error.issues.reduce<FieldErrors>((acc, issue) => {
+    const field = issue.path[0];
+    if (typeof field === "string" && !acc[field]) {
+      acc[field] = issue.message;
+    }
+
+    return acc;
+  }, {});
+};
+
+const getApiFieldErrors = (error: ValidationError): FieldErrors =>
+  Object.entries(error.fieldErrors).reduce<FieldErrors>((acc, [field, message]) => {
+    acc[normalizeFieldName(field)] = message;
+    return acc;
+  }, {});
 
 const useProductoFormBase = <T extends object>(initialState: T) => {
   const [formData, setFormData] = useState<T>(initialState);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -26,18 +59,24 @@ const useProductoFormBase = <T extends object>(initialState: T) => {
         ? Number(value)
         : value
     } as T));
+
+    setFieldErrors(prev => {
+      if (!prev[name]) return prev;
+
+      const next = { ...prev };
+      delete next[name];
+      return next;
+    });
   };
 
   return {
     formData,
     setFormData,
+    fieldErrors,
+    setFieldErrors,
     handleChange
   };
 };
-
-/* =========================================================
-   Helpers
-   ========================================================= */
 
 const getInitial = (): AddProductoCommand => ({
   nombreProducto: "",
@@ -50,71 +89,119 @@ const getInitial = (): AddProductoCommand => ({
   coleccionId: undefined
 });
 
-/* =========================================================
-   Hook: Creación deProducto
-   ========================================================= */
-
 type AddProps = {
-  onSuccess?: () => void;
+  onSuccess?: () => void | Promise<void>;
 };
 
 export const useAddProductoForm = ({ onSuccess }: AddProps) => {
-  const { formData, setFormData, handleChange } =
-    useProductoFormBase<AddProductoCommand>(getInitial());
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const {
+    formData,
+    setFormData,
+    fieldErrors,
+    setFieldErrors,
+    handleChange
+  } = useProductoFormBase<AddProductoCommand>(getInitial());
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setSubmitError(null);
+    setFieldErrors({});
+
+    const result = addProductoSchema.safeParse(formData);
+
+    if (!result.success) {
+      setFieldErrors(getZodFieldErrors(result.error));
+      return;
+    }
+
+    setIsSubmitting(true);
 
     try {
       await addProductoAsync(formData);
-      onSuccess?.();
+      await onSuccess?.();
       setFormData(getInitial());
     } catch (error) {
-      console.error("Error al crear producto:", error);
+      if (error instanceof ValidationError) {
+        setFieldErrors(getApiFieldErrors(error));
+      }
+
+      setSubmitError(getErrorMessage(error, "Error al crear producto"));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return {
     formData,
+    fieldErrors,
+    submitError,
     handleChange,
-    handleSubmit
+    handleSubmit,
+    isSubmitting
   };
 };
 
-/* =========================================================
-   Hook: Actualización de Producto
-   ========================================================= */
-
 type UpdateProps = {
-  initialData: UpdateProductoCommand; // obligatorio
-  onSuccess?: () => void;
+  initialData: UpdateProductoCommand;
+  onSuccess?: () => void | Promise<void>;
 };
 
 export const useUpdateProductoForm = ({
   initialData,
   onSuccess
 }: UpdateProps) => {
-  const { formData, setFormData, handleChange } =
-    useProductoFormBase<UpdateProductoCommand>(initialData);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const {
+    formData,
+    setFormData,
+    fieldErrors,
+    setFieldErrors,
+    handleChange
+  } = useProductoFormBase<UpdateProductoCommand>(initialData);
 
   useEffect(() => {
     setFormData(initialData);
-  }, [initialData, setFormData]);
+    setFieldErrors({});
+    setSubmitError(null);
+  }, [initialData, setFormData, setFieldErrors]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setSubmitError(null);
+    setFieldErrors({});
+
+    const result = updateProductoSchema.safeParse(formData);
+
+    if (!result.success) {
+      setFieldErrors(getZodFieldErrors(result.error));
+      return;
+    }
+
+    setIsSubmitting(true);
 
     try {
       await updateProductoAsync(formData);
-      onSuccess?.();
+      await onSuccess?.();
     } catch (error) {
-      console.error("Error al actualizar producto:", error);
+      if (error instanceof ValidationError) {
+        setFieldErrors(getApiFieldErrors(error));
+      }
+
+      setSubmitError(getErrorMessage(error, "Error al actualizar producto"));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return {
     formData,
+    fieldErrors,
+    submitError,
     handleChange,
-    handleSubmit
+    handleSubmit,
+    isSubmitting
   };
 };
