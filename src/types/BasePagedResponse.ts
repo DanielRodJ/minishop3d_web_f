@@ -1,4 +1,6 @@
-export type BasePagedDto<T> = {
+// src/types/BasePagedResponse
+
+export type BasePagedResponse<T> = {
   items: T[];
   totalItems: number;
   pageNumber: number;
