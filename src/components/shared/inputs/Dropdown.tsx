@@ -1,33 +1,67 @@
-import { useEffect, useState } from "react";
 import Select from "react-select";
-import { getAcabadosMaterial } from "../../../services/ApiCatalogs";
 
-type Option = {
-    value: string;
-    label: string;
+import { ErrorMessage } from "@/components/shared/feedback/ErrorMessage";
+
+export type SelectOption = {
+  value: string | number;
+  label: string;
 };
 
-export const DropdownExample = () => {
-    const [options, setOptions] = useState<Option[]>([]);
+type DropdownProps = {
+  id?: string;
+  name: string;
+  value?: string | number;
+  options: SelectOption[];
+  placeholder?: string;
+  disabled?: boolean;
+  error?: string;
+  onChange: (name: string, value: string | number) => void;
+};
 
-    useEffect(() => {
-        const loadData = async () => {
-            try {
-                const data = await getAcabadosMaterial();
+export const Dropdown = ({
+  id,
+  name,
+  value,
+  options,
+  placeholder = "Selecciona una opcion",
+  disabled,
+  error,
+  onChange
+}: DropdownProps) => {
 
-                const mapped: Option[] = data.map((item) => ({
-                    value: item.codigo,
-                    label: item.nombre
-                }));
+  const selectedOption =
+    options.find(option => option.value === value) ?? null;
 
-                setOptions(mapped);
-            } catch (error) {
-                console.error("Error al cargar acabados de material:", error);
-            }
-        };
+  const hasError = !!error;
 
-        loadData();
-    }, []);
+  return (
+    <div>
+      <Select
+        inputId={id ?? name}
+        name={name}
+        value={selectedOption}
+        options={options}
+        placeholder={placeholder}
+        isDisabled={disabled}
+        onChange={(option) => {
+          if (option) onChange(name, option.value);
+        }}
+        classNames={{
+          control: () =>
+            `!min-h-[38px] !rounded-md !border !shadow-none ${
+              hasError
+                ? "!border-red-500"
+                : "!border-gray-300"
+            }`,
+          valueContainer: () => "!px-3",
+          input: () => "!text-sm",
+          option: () => "!text-sm",
+        }}
+      />
 
-    return <Select options={options} />;
+      {error && (
+        <ErrorMessage message={error} />
+      )}
+    </div>
+  );
 };
