@@ -9,6 +9,7 @@ import { ShopLayout } from "@/layouts/ShopLayout";
 
 import { HomePage } from "@/pages/admin/HomePage";
 import { ProductsManagementPage } from "@/pages/admin/ProductsManagementPage";
+import { ProductPresentationsPage } from "@/pages/admin/ProductPresentationsPage";
 import { temporal as LoginPage } from "@/pages/auth/LoginPage";
 import ErrorPage from "@/pages/auth/ErrorPage";
 import ShopPage from "@/pages/shop/ShopPage";
@@ -45,6 +46,7 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <HomePage /> },
           { path: "products", element: <ProductsManagementPage /> },
+          { path: "products/:productoId/presentaciones", element: <ProductPresentationsPage /> },
           { path: "listings", element: <ListingsManagementPage /> },
         ],
       },
