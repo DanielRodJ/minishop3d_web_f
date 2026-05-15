@@ -1,11 +1,20 @@
 // src/features/admin/hooks/useProductos.ts
 
 import { useCallback, useEffect, useState } from "react";
-import { getProductosAsync, getProductoAsync } from "../services/ProductoApi";
-import type { ProductosResponse, ProductoDetalladoResponse } from "../../../types/responses/ProductResponses";
-import { AuthError } from "../../../errors/AuthError";
 import { useNavigate } from "react-router-dom";
-import { getErrorMessage } from "../../../errors/ApiError";
+
+import { getErrorMessage } from "@/errors/ApiError";
+import { AuthError } from "@/errors/AuthError";
+
+import {
+  getProductoAsync,
+  getProductosAsync
+} from "@/features/admin/services/ApiProducto";
+
+import type {
+  ProductoDetalladoResponse,
+  ProductosResponse
+} from "@/types/responses/ProductoResponses";
 
 export const useProductos = () => {
 
@@ -14,10 +23,10 @@ export const useProductos = () => {
   const [producto, setProducto] = useState<ProductoDetalladoResponse | null>(null);
   const [productos, setProductos] = useState<ProductosResponse | null>(null);
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingProductos, setIsLoadingProductos] = useState(false);
   const [isLoadingProducto, setIsLoadingProducto] = useState(false);
 
-  const [error, setError] = useState<string | null>(null);
+  const [productosError, setProductosError] = useState<string | null>(null);
   const [productoError, setProductoError] = useState<string | null>(null);
 
   const [page, setPage] = useState(1);
@@ -48,8 +57,8 @@ export const useProductos = () => {
   const fetchProductos = useCallback(async () => {
     try {
 
-      setIsLoading(true)
-      setError(null);
+      setIsLoadingProductos(true)
+      setProductosError(null);
 
       const data = await getProductosAsync({
         pageNumber: page,
@@ -65,10 +74,10 @@ export const useProductos = () => {
       if (error instanceof AuthError) {
         navigate("/shop");
       } else {
-        setError(getErrorMessage(error, "Error al cargar productos"))
+        setProductosError(getErrorMessage(error, "Error al cargar productos"))
       }
     } finally {
-      setIsLoading(false)
+      setIsLoadingProductos(false)
     }
   }, [navigate, page, search]);
 
@@ -83,16 +92,16 @@ export const useProductos = () => {
   return {
     productos,
     producto,
-    isLoading,
+    isLoading: isLoadingProductos,
     isLoadingProducto,
-    error,
+    error: productosError,
     productoError,
     clearProductoError,
     page,
     setPage,
     search,
     setSearch,
-    refetch: fetchProductos,
-    refetchProducto: fetchProducto
+    fetchProducto,
+    fetchProductos
   };
 };

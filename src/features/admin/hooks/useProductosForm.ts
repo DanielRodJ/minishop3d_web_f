@@ -1,16 +1,11 @@
 // src/features/admin/hooks/useProductosForm.ts
 
-import { useEffect, useState, type ChangeEvent } from "react";
+import { useEffect, useState } from "react";
 
-import type { z } from "zod";
-
-import { getErrorMessage, type FieldErrors } from "@/errors/ApiError";
+import { getErrorMessage } from "@/errors/ApiError";
 import { ValidationError } from "@/errors/ValidationError";
 
-import type {
-  AddProductoCommand,
-  UpdateProductoCommand
-} from "@/types/ProductCommand";
+import { useFormBase } from "@/features/admin/hooks/useFormBase";
 
 import {
   addProductoSchema,
@@ -19,90 +14,51 @@ import {
 
 import {
   addProductoAsync,
-  updateProductoAsync
-} from "@/features/admin/services/ProductoApi";
+  updateProductoAsync,
+} from "@/features/admin/services/ApiProducto";
 
-const normalizeFieldName = (field: string) =>
-  field.charAt(0).toLowerCase() + field.slice(1);
+import {
+  getApiFieldErrors,
+  getZodFieldErrors
+} from "@/features/admin/utils/formErrorsUtils";
 
-const getZodFieldErrors = <T extends object>(
-  error: z.ZodError<T>
-): FieldErrors => {
-  return error.issues.reduce<FieldErrors>((acc, issue) => {
-    const field = issue.path[0];
-    if (typeof field === "string" && !acc[field]) {
-      acc[field] = issue.message;
-    }
+import type {
+  AddProductoCommand,
+  UpdateProductoCommand,
+} from "@/types/ProductoCommand";
 
-    return acc;
-  }, {});
-};
-
-const getApiFieldErrors = (error: ValidationError): FieldErrors =>
-  Object.entries(error.fieldErrors).reduce<FieldErrors>((acc, [field, message]) => {
-    acc[normalizeFieldName(field)] = message;
-    return acc;
-  }, {});
-
-const useProductoFormBase = <T extends object>(initialState: T) => {
-  const [formData, setFormData] = useState<T>(initialState);
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-
-    setFormData(prev => ({
-      ...prev,
-      [name]: ["costoProduccionBase", "filamentoUsoBase"].includes(name)
-        ? Number(value)
-        : value
-    } as T));
-
-    setFieldErrors(prev => {
-      if (!prev[name]) return prev;
-
-      const next = { ...prev };
-      delete next[name];
-      return next;
-    });
-  };
-
-  return {
-    formData,
-    setFormData,
-    fieldErrors,
-    setFieldErrors,
-    handleChange
-  };
-};
-
-const getInitial = (): AddProductoCommand => ({
+// creación de estado inicial vacío de Producto.
+export const getInitialProducto = (): AddProductoCommand => ({
   nombreProducto: "",
   descripcionProducto: "",
-  escalaBase: "",
-  costoProduccionBase: 0,
-  filamentoUsoBase: 0,
   autorNombre: undefined,
   fechaLanzamiento: "",
   coleccionId: undefined
 });
 
-type AddProps = {
+// prop para definición de operación post éxito.
+type SubmitProps = {
   onSuccess?: () => void | Promise<void>;
 };
 
-export const useAddProductoForm = ({ onSuccess }: AddProps) => {
+// hook para manejo completo del formulario de creación de productos:
+// estado, validación, envío y manejo de errores.
+export const useAddProductoForm = ({ onSuccess }: SubmitProps) => {
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
   const {
     formData,
     setFormData,
     fieldErrors,
     setFieldErrors,
-    handleChange
-  } = useProductoFormBase<AddProductoCommand>(getInitial());
+    handleChange,
+    handleSelectChange
+  } = useFormBase<AddProductoCommand>({
+    initialState: getInitialProducto()
+    // no hay numericFields.
+  });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -121,7 +77,7 @@ export const useAddProductoForm = ({ onSuccess }: AddProps) => {
     try {
       await addProductoAsync(formData);
       await onSuccess?.();
-      setFormData(getInitial());
+      setFormData(getInitialProducto());
     } catch (error) {
       if (error instanceof ValidationError) {
         setFieldErrors(getApiFieldErrors(error));
@@ -138,29 +94,35 @@ export const useAddProductoForm = ({ onSuccess }: AddProps) => {
     fieldErrors,
     submitError,
     handleChange,
+    handleSelectChange,
     handleSubmit,
     isSubmitting
   };
 };
 
-type UpdateProps = {
+type UpdateProductoProps = SubmitProps & {
   initialData: UpdateProductoCommand;
-  onSuccess?: () => void | Promise<void>;
 };
 
 export const useUpdateProductoForm = ({
   initialData,
   onSuccess
-}: UpdateProps) => {
+}: UpdateProductoProps) => {
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
   const {
     formData,
     setFormData,
     fieldErrors,
     setFieldErrors,
-    handleChange
-  } = useProductoFormBase<UpdateProductoCommand>(initialData);
+    handleChange,
+    handleSelectChange
+  } = useFormBase<UpdateProductoCommand>({
+    initialState: initialData,
+    // no hay numericFields
+  });
 
   useEffect(() => {
     setFormData(initialData);
@@ -201,6 +163,7 @@ export const useUpdateProductoForm = ({
     fieldErrors,
     submitError,
     handleChange,
+    handleSelectChange,
     handleSubmit,
     isSubmitting
   };
