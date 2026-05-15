@@ -1,16 +1,21 @@
-// src/features/admin/services/ProductoApi.ts
+// src/features/admin/services/ApiProducto.ts
 
 import { api } from "@/services/ApiClient";
 
 import type { BaseQueryParams } from "@/types/BaseQueryParams";
-import type { AddProductoCommand, UpdateProductoCommand } from "@/types/ProductCommand";
-import type { ProductoDetalladoResponse, ProductosResponse } from "@/types/responses/ProductResponses";
+
+import type {
+  AddProductoCommand,
+  UpdateProductoCommand,
+} from "@/types/ProductoCommand";
+
+import type {
+  ProductoDetalladoResponse,
+  ProductoIdResponse,
+  ProductosResponse
+} from "@/types/responses/ProductoResponses";
 
 const BASE_PATH = "/minisho3d/producto";
-
-export type ProductoIdResponse = {
-  productId: number;
-};
 
 export const getProductoAsync = (id: number) => {
   return api.request<ProductoDetalladoResponse>(
@@ -19,10 +24,7 @@ export const getProductoAsync = (id: number) => {
   );
 };
 
-export const addProductoAsync = (
-  data: AddProductoCommand
-) => {
-
+export const addProductoAsync = (data: AddProductoCommand) => {
   return api.request<ProductoIdResponse>(
     api.private(BASE_PATH, {
       method: "POST",
@@ -32,17 +34,15 @@ export const addProductoAsync = (
   );
 };
 
-export const updateProductoAsync = (
-  data: UpdateProductoCommand
-) => {
+export const updateProductoAsync = (data: UpdateProductoCommand) => {
   return api.request<boolean>(
     api.private(`${BASE_PATH}/${data.productoId}`, {
       method: "PUT",
       body: JSON.stringify(data)
     }),
     "Error al actualizar el producto"
-  )
-}
+  );
+};
 
 export const getProductosAsync = (
   params?: BaseQueryParams
@@ -54,13 +54,12 @@ export const getProductosAsync = (
   if (params?.searchTerm) query.append("searchTerm", params.searchTerm);
   if (params?.filterBy) query.append("filterBy", params.filterBy);
   if (params?.sortBy) query.append("sortBy", params.sortBy);
-  if (params?.sortDescending !== undefined)
+  if (params?.sortDescending !== undefined) {
     query.append("sortDescending", params.sortDescending.toString());
+  }
 
   return api.request<ProductosResponse>(
-    api.private(
-      `${BASE_PATH}/productos?${query.toString()}`
-    ),
+    api.private(`${BASE_PATH}/productos?${query.toString()}`),
     "Error al obtener productos"
   );
 };
