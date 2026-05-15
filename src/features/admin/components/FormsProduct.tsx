@@ -2,15 +2,14 @@
 
 import type { ChangeEvent } from "react";
 
-import type { FieldErrors } from "@/errors/ApiError";
-import type { AddProductoCommand } from "@/types/ProductCommand";
-
 import { ErrorMessage } from "@/components/shared/feedback/ErrorMessage";
-
 import { DatePicker } from "@/components/shared/inputs/DatePicker";
-import { InputNumber } from "@/components/shared/inputs/InputNumber";
 import { InputText } from "@/components/shared/inputs/InputText";
 import { InputTextArea } from "@/components/shared/inputs/InputTextArea";
+
+import type { FieldErrors } from "@/errors/ApiError";
+
+import type { AddProductoCommand } from "@/types/ProductoCommand";
 
 type ProductoFormData = AddProductoCommand & { productoId?: number };
 
@@ -34,12 +33,12 @@ export const FormProducto = ({
   onClose,
   disabled
 }: Props) => {
-  const title = formData.productoId ? "Modificar producto" : "Añadir nuevo producto";
+  const title = formData.productoId ? "Modificar producto" : "Añadir producto";
   const submitText = formData.productoId ? "Guardar cambios" : "Crear producto";
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="relative bg-white w-full max-w-4xl rounded-xl p-6 shadow-2xl">
+      <div className="relative bg-white w-full max-w-3xl rounded-lg p-6 shadow-2xl">
         <button
           type="button"
           onClick={onClose}
@@ -56,7 +55,7 @@ export const FormProducto = ({
 
         <hr className="border-t border-gray-200 my-4" />
 
-        <form onSubmit={handleSubmit} autoComplete="off" className="space-y-6">
+        <form onSubmit={handleSubmit} autoComplete="off" noValidate className="space-y-5">
           {submitError && (
             <div className="rounded-md border border-red-200 bg-red-50 p-3">
               <ErrorMessage message={submitError} />
@@ -68,54 +67,35 @@ export const FormProducto = ({
 
             <div>
               <InputText
-                id="nombreProducto"
-                name="nombreProducto"
+                id="nombre"
+                name="nombre"
                 placeholder="Nombre del producto"
                 value={formData.nombreProducto}
                 onChange={handleChange}
-                variant={fieldErrors.nombreProducto ? "error" : "default"}
+                variant={fieldErrors.nombre ? "error" : "default"}
                 disabled={disabled}
               />
-              {fieldErrors.nombreProducto && (
-                <ErrorMessage message={fieldErrors.nombreProducto} />
+              {fieldErrors.nombre && (
+                <ErrorMessage message={fieldErrors.nombre} />
               )}
             </div>
 
             <div>
               <InputTextArea
-                id="descripcionProducto"
-                name="descripcionProducto"
+                id="descripcion"
+                name="descripcion"
                 placeholder="Descripción del producto"
                 value={formData.descripcionProducto}
                 onChange={handleChange}
-                className={fieldErrors.descripcionProducto ? "border-red-500 focus:ring-red-500" : ""}
+                className={fieldErrors.descripcion ? "border-red-500 focus:ring-red-500" : ""}
                 disabled={disabled}
               />
-              {fieldErrors.descripcionProducto && (
-                <ErrorMessage message={fieldErrors.descripcionProducto} />
+              {fieldErrors.descripcion && (
+                <ErrorMessage message={fieldErrors.descripcion} />
               )}
             </div>
-          </div>
 
-          <div className="space-y-4">
-            <h3 className="text-sm font-medium text-gray-500">Datos técnicos</h3>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <InputText
-                  id="escalaBase"
-                  name="escalaBase"
-                  placeholder="Escala base"
-                  value={formData.escalaBase}
-                  onChange={handleChange}
-                  variant={fieldErrors.escalaBase ? "error" : "default"}
-                  disabled={disabled}
-                />
-                {fieldErrors.escalaBase && (
-                  <ErrorMessage message={fieldErrors.escalaBase} />
-                )}
-              </div>
-
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <InputText
                   id="autorNombre"
@@ -130,52 +110,20 @@ export const FormProducto = ({
                   <ErrorMessage message={fieldErrors.autorNombre} />
                 )}
               </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <InputNumber
-                  id="costoProduccionBase"
-                  name="costoProduccionBase"
-                  placeholder="Costo producción"
-                  value={formData.costoProduccionBase}
-                  onChange={handleChange}
-                  variant={fieldErrors.costoProduccionBase ? "error" : "default"}
-                  disabled={disabled}
-                />
-                {fieldErrors.costoProduccionBase && (
-                  <ErrorMessage message={fieldErrors.costoProduccionBase} />
-                )}
-              </div>
 
               <div>
-                <InputNumber
-                  id="filamentoUsoBase"
-                  name="filamentoUsoBase"
-                  placeholder="Filamento"
-                  value={formData.filamentoUsoBase}
+                <DatePicker
+                  id="fechaLanzamiento"
+                  name="fechaLanzamiento"
+                  value={formData.fechaLanzamiento}
                   onChange={handleChange}
-                  variant={fieldErrors.filamentoUsoBase ? "error" : "default"}
+                  variant={fieldErrors.fechaLanzamiento ? "error" : "default"}
                   disabled={disabled}
                 />
-                {fieldErrors.filamentoUsoBase && (
-                  <ErrorMessage message={fieldErrors.filamentoUsoBase} />
+                {fieldErrors.fechaLanzamiento && (
+                  <ErrorMessage message={fieldErrors.fechaLanzamiento} />
                 )}
               </div>
-            </div>
-
-            <div>
-              <DatePicker
-                id="fechaLanzamiento"
-                name="fechaLanzamiento"
-                value={formData.fechaLanzamiento}
-                onChange={handleChange}
-                variant={fieldErrors.fechaLanzamiento ? "error" : "default"}
-                disabled={disabled}
-              />
-              {fieldErrors.fechaLanzamiento && (
-                <ErrorMessage message={fieldErrors.fechaLanzamiento} />
-              )}
             </div>
           </div>
 
