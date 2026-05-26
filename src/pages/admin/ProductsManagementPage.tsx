@@ -12,7 +12,6 @@ import { FiltersComponent } from "@/features/admin/components/FiltersComponent";
 import { FormProducto } from "@/features/admin/components/FormsProduct";
 import { Table, type Column } from "@/features/admin/components/TableTemplate";
 
-import { useProductos } from "@/features/admin/hooks/useProductos";
 import {
   getInitialProducto,
   useAddProductoForm,
@@ -20,10 +19,14 @@ import {
 } from "@/features/admin/hooks/useProductosForm";
 
 import type { UpdateProductoCommand } from "@/types/ProductoCommand";
+
 import type {
   ProductoDetalladoResponse,
   ProductoResponse
 } from "@/types/responses/ProductoResponses";
+
+import { useProductos } from "@/features/admin/hooks/productos/useProductos";
+import { useProducto } from "@/features/admin/hooks/productos/useProducto";
 
 // método para mapear response a command.
 // preparación de datos para mostrar en formulario.
@@ -56,17 +59,20 @@ export const ProductsManagementPage = () => {
 
   const {
     productos,
-    producto,
-    isLoading,
-    isLoadingProducto,
-    error,
-    productoError,
-    clearProductoError,
+    isLoadingProductos,
+    productosError,
     setPage,
     setSearch,
-    fetchProducto,
     fetchProductos
   } = useProductos();
+
+  const {
+    producto,
+    isLoadingProducto,
+    productoError,
+    clearProductoError,
+    fetchProducto
+  } = useProducto();
 
   const columnsTable = [
     { header: "ID", key: "productoId" },
@@ -176,12 +182,12 @@ export const ProductsManagementPage = () => {
           <ButtonCustom preset="filters" onClick={() => setFiltersOpen(prev => !prev)} />
         </div>
 
-        {isLoading ? (
+        {isLoadingProductos ? (
           <div className="flex justify-center py-10">
             <Spinner />
           </div>
-        ) : error ? (
-          <div className="p-4 text-center text-red-600">{error}</div>
+        ) : productosError ? (
+          <div className="p-4 text-center text-red-600">{productosError}</div>
         ) : productos && productos.items.length > 0 ? (
           <Table
             columns={columnsTable}
