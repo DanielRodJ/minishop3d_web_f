@@ -1,4 +1,4 @@
-// Archivo: src/components/ui/Buttons.tsx
+// src/components/ui/Buttons.tsx
 
 import React from "react";
 import {
@@ -7,7 +7,8 @@ import {
     TrashIcon,
     FolderPlusIcon,
     DocumentArrowDownIcon,
-    QuestionMarkCircleIcon
+    QuestionMarkCircleIcon,
+    ArrowPathIcon
 } from "@heroicons/react/24/solid";
 
 /* =========================================================
@@ -86,7 +87,12 @@ const buttonPresets: Record<string, ButtonPresetConfig> = {
         variant: "tableButton",
         Icon: TrashIcon,
         className: "text-red-500"
-    }
+    },
+    reloadData: {
+        text: "Actualizar",
+        variant: "adminButton",
+        Icon: ArrowPathIcon
+    },
 };
 
 type ButtonPreset = keyof typeof buttonPresets;
