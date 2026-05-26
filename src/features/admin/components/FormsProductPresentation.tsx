@@ -115,6 +115,7 @@ export const FormProductPresentation = ({
               error={fieldErrors.dimensionX}
               disabled={disabled}
               onChange={handleChange}
+              step={0.01}
             />
 
             <InputNumber
@@ -126,6 +127,7 @@ export const FormProductPresentation = ({
               error={fieldErrors.dimensionY}
               disabled={disabled}
               onChange={handleChange}
+              step={0.01}
             />
 
             <InputNumber
@@ -137,6 +139,7 @@ export const FormProductPresentation = ({
               error={fieldErrors.dimensionZ}
               disabled={disabled}
               onChange={handleChange}
+              step={0.01}
             />
           </div>
 
@@ -161,6 +164,7 @@ export const FormProductPresentation = ({
               error={fieldErrors.cantidadGramosFilamentoUso}
               disabled={disabled}
               onChange={handleChange}
+              step={0.01}
             />
 
             <InputNumber
@@ -185,6 +189,7 @@ export const FormProductPresentation = ({
               error={fieldErrors.costoProduccionAdicional}
               disabled={disabled}
               onChange={handleChange}
+              step={0.01}
             />
 
             <div className="flex items-start gap-2">
