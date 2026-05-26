@@ -234,11 +234,11 @@ export const ProductPresentationsPage = () => {
           handleChange={updateForm.handleChange}
           handleSelectChange={updateForm.handleSelectChange}
           handleSubmit={updateForm.handleSubmit}
-          handleCalculatePrice={() => { }}
+          handleCalculatePrice={updateForm.handleCalculatePrice}
           fieldErrors={updateForm.fieldErrors}
           submitError={updateForm.submitError}
           disabled={updateForm.isSubmitting}
-          isCalculating={false}
+          isCalculating={updateForm.isCalculating}
           onClose={() => setSelectedPresentation(null)}
         />
       )}
@@ -278,12 +278,14 @@ const PresentationCard = ({ presentation, onEdit }: PresentationCardProps) => {
           {presentation.cantidadGramosFilamentoUso} g · {presentation.tiempoImpresionMinutos} min
         </p>
         <div className="flex items-center justify-between pt-2">
-          <span className="rounded bg-slate-100 px-2 py-1 text-xs text-slate-600">
-            {statusLabel}
-          </span>
-          <span className="text-sm font-semibold text-slate-900">
-            ${presentation.precioVenta}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="rounded bg-slate-100 px-2 py-1 text-xs text-slate-600">
+              {statusLabel}
+            </span>
+            <span className="text-sm font-semibold text-slate-900">
+              ${presentation.precioVenta}
+            </span>
+          </div>
         </div>
       </div>
 

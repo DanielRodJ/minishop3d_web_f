@@ -190,8 +190,11 @@ export const useUpdateProductoPresentacionForm = ({
     initialData,
     onSuccess
 }: UpdatePresentacionProps) => {
+    
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
+    const [isCalculating, setIsCalculating] = useState(false);
+
     const {
         formData,
         setFormData,
@@ -238,13 +241,53 @@ export const useUpdateProductoPresentacionForm = ({
         }
     };
 
+    
+    const handleCalculatePrice = async () => {
+
+        setSubmitError(null);
+
+        setIsCalculating(true);
+
+        try {
+            const precioVenta =
+                await calculateProductoPresentacionAsync({
+                    filamentoId: formData.filamentoId,
+                    escalaCodigo: formData.escalaCodigo,
+                    tiempoImpresionMinutos: formData.tiempoImpresionMinutos,
+                    cantidadGramosFilamentoUso: formData.cantidadGramosFilamentoUso,
+                    costoProduccionAdicional: formData.costoProduccionAdicional
+                });
+
+            setFormData(prev => ({
+                ...prev,
+                precioVenta
+            }));
+
+        } catch (error) {
+
+            setSubmitError(
+                getErrorMessage(
+                    error,
+                    "Error al calcular precio de venta"
+                )
+            );
+
+        } finally {
+            setIsCalculating(false);
+        }
+    };
+
     return {
         formData,
         fieldErrors,
         submitError,
+
         handleChange,
         handleSelectChange,
         handleSubmit,
-        isSubmitting
+        handleCalculatePrice,
+
+        isSubmitting,
+        isCalculating
     };
 };
