@@ -2,7 +2,9 @@
 
 import { api } from "@/services/ApiClient";
 
-import type { BaseQueryParams } from "@/types/BaseQueryParams";
+import type {
+  BaseQueryParams
+} from "@/types/BaseQueryParams";
 
 import type {
   AddProductoCommand,
@@ -10,6 +12,11 @@ import type {
 } from "@/types/ProductoCommand";
 
 import type {
+  ProductoPresentacionesResponse
+} from "@/types/responses/ProductoPresentacionResponses";
+
+import type {
+  CantidadProductosResponse,
   ProductoDetalladoResponse,
   ProductoIdResponse,
   ProductosResponse
@@ -61,5 +68,35 @@ export const getProductosAsync = (
   return api.request<ProductosResponse>(
     api.private(`${BASE_PATH}/productos?${query.toString()}`),
     "Error al obtener productos"
+  );
+};
+
+export const getProductoPresentacionesAsync = (
+  id: number,
+  params?: BaseQueryParams
+): Promise<ProductoPresentacionesResponse> => {
+  const query = new URLSearchParams();
+
+  if (params?.pageNumber) query.append("pageNumber", params.pageNumber.toString());
+  if (params?.pageSize) query.append("pageSize", params.pageSize.toString());
+  if (params?.searchTerm) query.append("searchTerm", params.searchTerm);
+  if (params?.filterBy) query.append("filterBy", params.filterBy);
+  if (params?.sortBy) query.append("sortBy", params.sortBy);
+  if (params?.sortDescending !== undefined) {
+    query.append("sortDescending", params.sortDescending.toString());
+  }
+
+  return api.request<ProductoPresentacionesResponse>(
+    api.private(`${BASE_PATH}/${id}/presentaciones?${query.toString()}`),
+    "Error al obtener presentaciones del producto"
+  );
+};
+
+export const getCantidadPresentacionesAsync = (
+  id: number,
+): Promise<CantidadProductosResponse> => {
+  return api.request<CantidadProductosResponse>(
+    api.private(`${BASE_PATH}/${id}/cantidad-presentaciones`),
+    "Error al obtener la cantidad de presentaciones"
   );
 };

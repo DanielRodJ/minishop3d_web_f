@@ -21,5 +21,11 @@ export type ProductoIdResponse = {
   productoId: number;
 };
 
+export type CantidadProductosResponse = {
+  productoId: number;
+  cantidadTotalPresentaciones: number;
+  cantidadPresentacionesEnEstadoDisponible: number;
+};
+
 export type ProductosResponse = BasePagedResponse<ProductoResponse>;
 export type ProductosDetalladosResponse = BasePagedResponse<ProductoDetalladoResponse>;
