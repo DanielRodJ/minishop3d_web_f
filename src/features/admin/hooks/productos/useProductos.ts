@@ -40,11 +40,14 @@ export const useProductos = () => {
   useEffect(() => {
     fetchProductos();
   }, [fetchProductos]);
+  
+  const clearProductosError = () => setProductosError(null);
 
   return {
     productos,
     isLoadingProductos,
     productosError,
+    clearProductosError,
     page,
     setPage,
     search,
