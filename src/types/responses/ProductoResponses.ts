@@ -21,7 +21,7 @@ export type ProductoIdResponse = {
   productoId: number;
 };
 
-export type CantidadProductosResponse = {
+export type CantidadPresentacionesResponse = {
   productoId: number;
   cantidadTotalPresentaciones: number;
   cantidadPresentacionesEnEstadoDisponible: number;
