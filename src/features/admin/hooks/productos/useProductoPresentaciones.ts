@@ -1,4 +1,4 @@
-// src/features/admin/hooks/useProductoPresentaciones.ts
+// src/features/admin/hooks/productos/useProductoPresentaciones.ts
 
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
