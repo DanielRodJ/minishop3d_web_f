@@ -1,6 +1,6 @@
 // src/pages/admin/ProductsManagementPage.tsx
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { SearchBarCustom } from "@/components/shared/SearchBarComponents";
@@ -18,15 +18,15 @@ import {
   useUpdateProductoForm
 } from "@/features/admin/hooks/useProductosForm";
 
+import { useProducto } from "@/features/admin/hooks/productos/useProducto";
+import { useProductos } from "@/features/admin/hooks/productos/useProductos";
+
 import type { UpdateProductoCommand } from "@/types/ProductoCommand";
 
 import type {
   ProductoDetalladoResponse,
   ProductoResponse
 } from "@/types/responses/ProductoResponses";
-
-import { useProductos } from "@/features/admin/hooks/productos/useProductos";
-import { useProducto } from "@/features/admin/hooks/productos/useProducto";
 
 // método para mapear response a command.
 // preparación de datos para mostrar en formulario.
@@ -56,23 +56,26 @@ export const ProductsManagementPage = () => {
   const [isAddRecordFormOpen, setAddRecordFormOpen] = useState(false);
   const [isModifyRecordFormOpen, setModifyRecordFormOpen] = useState(false);
   const [selectedProductoId, setSelectedProductoId] = useState<number | null>(null);
+  const [showProductoErrorToast, setShowProductoErrorToast] = useState(false);
 
   const {
     productos,
     isLoadingProductos,
     productosError,
+    refetchProductos,
     setPage,
     setSearch,
-    fetchProductos
   } = useProductos();
 
   const {
     producto,
     isLoadingProducto,
     productoError,
-    clearProductoError,
-    fetchProducto
-  } = useProducto();
+  } = useProducto(
+    isModifyRecordFormOpen
+      ? selectedProductoId ?? undefined
+      : undefined
+  );
 
   const columnsTable = [
     { header: "ID", key: "productoId" },
@@ -99,7 +102,9 @@ export const ProductsManagementPage = () => {
             preset="tableInfo"
             aria-label="Administrar presentaciones"
             title="Presentaciones"
-            onClick={() => navigate(`/admin/products/${p.productoId}/presentaciones`)}
+            onClick={() =>
+              navigate(`/admin/products/${p.productoId}/presentaciones`)
+            }
           />
         </div>
       )
@@ -107,10 +112,11 @@ export const ProductsManagementPage = () => {
   ] satisfies Column<ProductoResponse>[];
 
   // valores vacíos iniciales del formulario de actualización.
-  const updateInitialUpdateFormData = useMemo(() =>
-    producto
-      ? buildUpdateProductoCommand(producto)
-      : EMPTY_UPDATE_PRODUCTO_FORM,
+  const updateInitialUpdateFormData = useMemo(
+    () =>
+      producto
+        ? buildUpdateProductoCommand(producto)
+        : EMPTY_UPDATE_PRODUCTO_FORM,
     [producto]
   );
 
@@ -122,15 +128,16 @@ export const ProductsManagementPage = () => {
   // método: cerrar formulario para modificar un producto.
   const handleCloseUpdateForm = () => {
     setModifyRecordFormOpen(false);
+    setSelectedProductoId(null);
   };
 
   const addProductoForm = useAddProductoForm({
     // si la operación es exitosa:
     // cerrar la ventana de addRecordForm
-    // actualizar la lista de productos. 
+    // actualizar la lista de productos.
     onSuccess: async () => {
       handleCloseAddForm();
-      await fetchProductos();
+      await refetchProductos();
     }
   });
 
@@ -138,38 +145,39 @@ export const ProductsManagementPage = () => {
     // envío de datos iniciales para updateRecordForm
     initialData: updateInitialUpdateFormData,
     // cerrar la ventana de updateRecordForm
-    // actualizar la lista de productos. 
+    // actualizar la lista de productos.
     onSuccess: async () => {
       handleCloseUpdateForm();
-      await fetchProductos();
+      await refetchProductos();
     }
   });
 
-  // método para actualización de término de busqueda y página.
+  // método para actualización de término de búsqueda y página.
   const handleSearch = useCallback((value: string) => {
     setSearch(value);
     setPage(1);
   }, [setPage, setSearch]);
 
   // método de botón para abrir modal en base a id asociado.
-  const handleOpenModifyRecordForm = async (id: number) => {
+  const handleOpenModifyRecordForm = (id: number) => {
     setSelectedProductoId(id);
     setModifyRecordFormOpen(true);
-
-    // si el producto no está, o es diferente al id actual, realiza nueva obtención.
-    if (!producto || producto.productoId !== id) {
-      await fetchProducto(id);
-    }
   };
 
+  useEffect(() => {
+    if (productoError) {
+      setShowProductoErrorToast(true);
+    }
+  }, [productoError]);
+
   return (
-    <div className="flex relative">
-      <header className="bg-white p-2 border border-slate-200 rounded-md w-full">
+    <div className="relative flex">
+      <header className="w-full rounded-md border border-slate-200 bg-white p-2">
         <h1 className="text-lg font-bold text-black">
           Productos registrados
         </h1>
 
-        <div className="flex flex-wrap gap-2 items-center justify-end my-4">
+        <div className="my-4 flex flex-wrap items-center justify-end gap-2">
           <div className="flex-1">
             <SearchBarCustom
               preset="searchBarTable"
@@ -177,9 +185,17 @@ export const ProductsManagementPage = () => {
             />
           </div>
 
-          <ButtonCustom preset="addRecord" onClick={() => setAddRecordFormOpen(true)} />
+          <ButtonCustom
+            preset="addRecord"
+            onClick={() => setAddRecordFormOpen(true)}
+          />
+
           <ButtonCustom preset="generateDocument" />
-          <ButtonCustom preset="filters" onClick={() => setFiltersOpen(prev => !prev)} />
+
+          <ButtonCustom
+            preset="filters"
+            onClick={() => setFiltersOpen(prev => !prev)}
+          />
         </div>
 
         {isLoadingProductos ? (
@@ -187,7 +203,9 @@ export const ProductsManagementPage = () => {
             <Spinner />
           </div>
         ) : productosError ? (
-          <div className="p-4 text-center text-red-600">{productosError}</div>
+          <div className="p-4 text-center text-red-600">
+            {productosError}
+          </div>
         ) : productos && productos.items.length > 0 ? (
           <Table
             columns={columnsTable}
@@ -196,7 +214,9 @@ export const ProductsManagementPage = () => {
             getRowId={(p) => p.productoId}
           />
         ) : productos && productos.items.length === 0 ? (
-          <div className="p-4 text-center">No hay productos registrados</div>
+          <div className="p-4 text-center">
+            No hay productos registrados
+          </div>
         ) : null}
       </header>
 
@@ -216,35 +236,37 @@ export const ProductsManagementPage = () => {
       )}
 
       {isModifyRecordFormOpen && isLoadingProducto && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
           <div className="rounded-md bg-white p-6 shadow-2xl">
             <Spinner />
           </div>
         </div>
       )}
 
-      {productoError && (
+      {showProductoErrorToast && productoError && (
         <div className="fixed bottom-4 right-4 z-50">
           <Toast
             message={productoError}
-            onClose={clearProductoError}
+            onClose={() => setShowProductoErrorToast(false)}
           />
         </div>
       )}
 
-      {isModifyRecordFormOpen && producto && producto.productoId === selectedProductoId && (
-        <FormProducto
-          key={producto.productoId}
-          mod="update"
-          formData={updateProductoForm.formData}
-          handleChange={updateProductoForm.handleChange}
-          handleSubmit={updateProductoForm.handleSubmit}
-          fieldErrors={updateProductoForm.fieldErrors}
-          submitError={updateProductoForm.submitError}
-          onClose={handleCloseUpdateForm}
-          disabled={updateProductoForm.isSubmitting}
-        />
-      )}
+      {isModifyRecordFormOpen &&
+        producto &&
+        producto.productoId === selectedProductoId && (
+          <FormProducto
+            key={producto.productoId}
+            mod="update"
+            formData={updateProductoForm.formData}
+            handleChange={updateProductoForm.handleChange}
+            handleSubmit={updateProductoForm.handleSubmit}
+            fieldErrors={updateProductoForm.fieldErrors}
+            submitError={updateProductoForm.submitError}
+            onClose={handleCloseUpdateForm}
+            disabled={updateProductoForm.isSubmitting}
+          />
+        )}
     </div>
   );
 };
