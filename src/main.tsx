@@ -3,7 +3,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
-import { QueryClient, QueryClientProvider, QueryCache } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from "@tanstack/react-query";
 
 import { AdminLayout } from "@/layouts/AdminLayout";
 import { ShopLayout } from "@/layouts/ShopLayout";
@@ -25,6 +25,13 @@ import "@/index.css";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
+    onError: (error) => {
+      if (error instanceof AuthError) {
+        window.location.href = "/login";
+      }
+    },
+  }),
+  mutationCache: new MutationCache({
     onError: (error) => {
       if (error instanceof AuthError) {
         window.location.href = "/login";

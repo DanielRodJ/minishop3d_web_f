@@ -1,30 +1,20 @@
 // src/pages/admin/ProductPresentationsPage.tsx
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { PlusIcon, PencilIcon } from "@heroicons/react/24/solid";
-
-import { Spinner } from "@/components/ui/Spinner";
-import { Toast } from "@/components/ui/Toast";
-import type { SelectOption } from "@/components/shared/inputs/Dropdown";
+import { useQuery } from "@tanstack/react-query";
 
 import { FormProductPresentation } from "@/features/admin/components/FormsProductPresentation";
-import {
-} from "@/features/admin/hooks/useProductosForm";
-import { getProductoAsync } from "@/features/admin/services/ApiProducto";
-import {
-  getEscalas,
-  getEstadosProducto,
-  getFilamentos
-} from "@/services/ApiCatalogo";
-
-import { getErrorMessage } from "@/errors/ApiError";
-import type {
-  ProductoDetalladoResponse,
-} from "@/types/responses/ProductoResponses";
-import type { UpdateProductoPresentacionCommand } from "@/types/ProductoPresentacionCommands";
-import type { ProductoPresentacionResponse } from "@/types/responses/ProductoPresentacionResponses";
 import { getInitialProductoPresentacion, useAddProductoPresentacionForm, useUpdateProductoPresentacionForm } from "@/features/admin/hooks/useProductPresentationForm";
+import { useProducto } from "@/features/admin/hooks/productos/useProducto";
+import { getErrorMessage } from "@/errors/ApiError";
+import { Spinner } from "@/components/ui/Spinner";
+import { Toast } from "@/components/ui/Toast";
+import { getEscalas, getEstadosProducto, getFilamentos } from "@/services/ApiCatalogo";
+import type { ProductoPresentacionResponse } from "@/types/responses/ProductoPresentacionResponses";
+import type { SelectOption } from "@/components/shared/inputs/Dropdown";
+import type { UpdateProductoPresentacionCommand } from "@/types/ProductoPresentacionCommands";
 
 const EMPTY_UPDATE_PRESENTACION: UpdateProductoPresentacionCommand = {
   productoPresentacionId: 0,
@@ -55,88 +45,76 @@ export const ProductPresentationsPage = () => {
   const navigate = useNavigate();
   const parsedProductoId = Number(productoId);
 
-  const [producto, setProducto] = useState<ProductoDetalladoResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
   const [isAddOpen, setAddOpen] = useState(false);
   const [selectedPresentation, setSelectedPresentation] =
     useState<ProductoPresentacionResponse | null>(null);
 
-  const [escalaOptions, setEscalaOptions] = useState<SelectOption[]>([]);
-  const [estadoOptions, setEstadoOptions] = useState<SelectOption[]>([]);
-  const [filamentoOptions, setFilamentoOptions] = useState<SelectOption[]>([]);
+  const {
+    producto,
+    isLoadingProducto,
+    productoError,
+    refetchProducto
+  } = useProducto(parsedProductoId);
 
-  const loadProducto = useCallback(async () => {
-    if (!parsedProductoId) return;
+  const escalasQuery = useQuery({
+    queryKey: ["catalogo", "escalas"],
+    queryFn: getEscalas,
+    staleTime: 5 * 60 * 1000,
+  });
 
-    try {
-      setIsLoading(true);
-      setError(null);
-      const data = await getProductoAsync(parsedProductoId);
-      setProducto(data);
-    } catch (error) {
-      setError(getErrorMessage(error, "Error al cargar producto"));
-    } finally {
-      setIsLoading(false);
+  const estadosQuery = useQuery({
+    queryKey: ["catalogo", "estados-producto"],
+    queryFn: getEstadosProducto,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const filamentosQuery = useQuery({
+    queryKey: ["catalogo", "filamentos"],
+    queryFn: getFilamentos,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const escalaOptions = useMemo<SelectOption[]>(() => {
+    return escalasQuery.data?.map(item => ({
+      value: item.codigo,
+      label: item.nombre
+    })) ?? [];
+  }, [escalasQuery.data]);
+
+  const estadoOptions = useMemo<SelectOption[]>(() => {
+    return estadosQuery.data?.map(item => ({
+      value: item.codigo,
+      label: item.nombre
+    })) ?? [];
+  }, [estadosQuery.data]);
+
+  const filamentoOptions = useMemo<SelectOption[]>(() => {
+    return filamentosQuery.data?.map(item => ({
+      value: item.filamentoId,
+      label: `${item.display} - ${item.color}`
+    })) ?? [];
+  }, [filamentosQuery.data]);
+
+  useEffect(() => {
+    if (filamentosQuery.error) {
+      setToast(getErrorMessage(filamentosQuery.error, "Error al cargar filamentos"));
+      return;
     }
-  }, [parsedProductoId]);
 
-  useEffect(() => {
-    loadProducto();
-  }, [loadProducto]);
-
-  useEffect(() => {
-    const loadCatalogs = async () => {
-      try {
-        const [escalas, estados, filamentos] = await Promise.allSettled([
-          getEscalas(),
-          getEstadosProducto(),
-          getFilamentos()
-        ]);
-
-        if (escalas.status === "fulfilled") {
-          setEscalaOptions(
-            escalas.value.map(item => ({
-              value: item.codigo,
-              label: item.nombre
-            }))
-          );
-        }
-
-        if (estados.status === "fulfilled") {
-          setEstadoOptions(
-            estados.value.map(item => ({
-              value: item.codigo,
-              label: item.nombre
-            }))
-          );
-        }
-
-        if (filamentos.status === "fulfilled") {
-          setFilamentoOptions(
-            filamentos.value.map(item => ({
-              value: item.filamentoId,
-              label: `${item.display} - ${item.color}`
-            }))
-          );
-        } else {
-          setToast("No se pudieron cargar los filamentos. Revisa la ruta del endpoint.");
-        }
-      } catch (error) {
-        setToast(getErrorMessage(error, "Error al cargar catalogos"));
-      }
-    };
-
-    loadCatalogs();
-  }, []);
+    if (escalasQuery.error || estadosQuery.error) {
+      setToast(
+        getErrorMessage(escalasQuery.error ?? estadosQuery.error!, "Error al cargar catalogos")
+      );
+    }
+  }, [escalasQuery.error, estadosQuery.error, filamentosQuery.error]);
 
   const addForm = useAddProductoPresentacionForm({
     productoId: parsedProductoId,
     onSuccess: async () => {
       setAddOpen(false);
-      await loadProducto();
+      await refetchProducto();
     }
   });
 
@@ -149,7 +127,7 @@ export const ProductPresentationsPage = () => {
     initialData: updateInitialData,
     onSuccess: async () => {
       setSelectedPresentation(null);
-      await loadProducto();
+      await refetchProducto();
     }
   });
 
@@ -185,12 +163,12 @@ export const ProductPresentationsPage = () => {
         </button>
       </div>
 
-      {isLoading ? (
+      {isLoadingProducto ? (
         <div className="flex justify-center py-10">
           <Spinner />
         </div>
-      ) : error ? (
-        <div className="p-4 text-center text-red-600">{error}</div>
+      ) : productoError ? (
+        <div className="p-4 text-center text-red-600">{productoError}</div>
       ) : presentations.length === 0 ? (
         <div className="rounded-md border border-dashed border-slate-300 p-8 text-center text-slate-500">
           Este producto aun no tiene presentaciones.

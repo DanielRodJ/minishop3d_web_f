@@ -14,9 +14,9 @@ import { Table, type Column } from "@/features/admin/components/TableTemplate";
 
 import {
   getInitialProducto,
-  useAddProductoForm,
-  useUpdateProductoForm
-} from "@/features/admin/hooks/useProductosForm";
+  useAddProductoMutation,
+  useUpdateProductoMutation,
+} from "@/features/admin/hooks/productos/useProductoMutations";
 
 import { useProducto } from "@/features/admin/hooks/productos/useProducto";
 import { useProductos } from "@/features/admin/hooks/productos/useProductos";
@@ -62,7 +62,6 @@ export const ProductsManagementPage = () => {
     productos,
     isLoadingProductos,
     productosError,
-    refetchProductos,
     setPage,
     setSearch,
   } = useProductos();
@@ -131,24 +130,20 @@ export const ProductsManagementPage = () => {
     setSelectedProductoId(null);
   };
 
-  const addProductoForm = useAddProductoForm({
+  const addProductoMutation = useAddProductoMutation({
     // si la operación es exitosa:
     // cerrar la ventana de addRecordForm
-    // actualizar la lista de productos.
-    onSuccess: async () => {
+    onSuccess: () => {
       handleCloseAddForm();
-      await refetchProductos();
     }
   });
 
-  const updateProductoForm = useUpdateProductoForm({
-    // envío de datos iniciales para updateRecordForm
+  const updateProductoMutation = useUpdateProductoMutation({
+    // envío de datos iniciales para updateRecordMutation
     initialData: updateInitialUpdateFormData,
     // cerrar la ventana de updateRecordForm
-    // actualizar la lista de productos.
-    onSuccess: async () => {
+    onSuccess: () => {
       handleCloseUpdateForm();
-      await refetchProductos();
     }
   });
 
@@ -225,13 +220,13 @@ export const ProductsManagementPage = () => {
       {isAddRecordFormOpen && (
         <FormProducto
           mod="add"
-          formData={addProductoForm.formData}
-          handleChange={addProductoForm.handleChange}
-          handleSubmit={addProductoForm.handleSubmit}
-          fieldErrors={addProductoForm.fieldErrors}
-          submitError={addProductoForm.submitError}
+          formData={addProductoMutation.formData}
+          handleChange={addProductoMutation.handleChange}
+          handleSubmit={addProductoMutation.handleSubmit}
+          fieldErrors={addProductoMutation.fieldErrors}
+          submitError={addProductoMutation.submitError}
           onClose={handleCloseAddForm}
-          disabled={addProductoForm.isSubmitting}
+          disabled={addProductoMutation.isSubmitting}
         />
       )}
 
@@ -258,13 +253,13 @@ export const ProductsManagementPage = () => {
           <FormProducto
             key={producto.productoId}
             mod="update"
-            formData={updateProductoForm.formData}
-            handleChange={updateProductoForm.handleChange}
-            handleSubmit={updateProductoForm.handleSubmit}
-            fieldErrors={updateProductoForm.fieldErrors}
-            submitError={updateProductoForm.submitError}
+            formData={updateProductoMutation.formData}
+            handleChange={updateProductoMutation.handleChange}
+            handleSubmit={updateProductoMutation.handleSubmit}
+            fieldErrors={updateProductoMutation.fieldErrors}
+            submitError={updateProductoMutation.submitError}
             onClose={handleCloseUpdateForm}
-            disabled={updateProductoForm.isSubmitting}
+            disabled={updateProductoMutation.isSubmitting}
           />
         )}
     </div>
