@@ -9,13 +9,13 @@ import {
 import { getErrorMessage } from "@/errors/ApiError";
 
 import type {
-  ProductoResponse
+  ProductoDetalladoResponse,
 } from "@/types/responses/ProductoResponses";
 
 export const useProducto = (productoId: number | undefined) => {
 
   // GetProductoQuery.
-  const productoQuery = useQuery<ProductoResponse, Error>({
+  const productoQuery = useQuery<ProductoDetalladoResponse, Error>({
     queryKey: ["producto", productoId],
     queryFn: async () => {
       if (!productoId) throw new Error("ID no válido");
