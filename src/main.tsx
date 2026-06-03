@@ -3,6 +3,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
+import { QueryClient, QueryClientProvider, QueryCache } from "@tanstack/react-query";
 
 import { AdminLayout } from "@/layouts/AdminLayout";
 import { ShopLayout } from "@/layouts/ShopLayout";
@@ -17,10 +18,20 @@ import PostDetailPage from "@/pages/shop/ListingDetailPage";
 import { ListingsManagementPage } from "@/pages/admin/ListingManagementPage";
 
 import { ProtectedRoute } from "@/components/shared/ProtectedRoute";
-
 import { AuthProvider } from "@/context/AuthContext";
+import { AuthError } from "@/errors/AuthError";
 
 import "@/index.css";
+
+const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error) => {
+      if (error instanceof AuthError) {
+        window.location.href = "/login";
+      }
+    },
+  }),
+});
 
 const router = createBrowserRouter([
   {
@@ -60,8 +71,10 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </QueryClientProvider>
   </StrictMode>
 );

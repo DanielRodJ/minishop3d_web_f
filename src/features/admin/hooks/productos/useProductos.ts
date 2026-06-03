@@ -1,57 +1,41 @@
 // src/features/admin/hooks/productos/useProductos.ts
 
-import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import { getProductosAsync } from "@/features/admin/services/ApiProducto";
-import { handleRequest } from "@/utils/requestUtils";
-
+import { getErrorMessage } from "@/errors/ApiError";
 import type { ProductosResponse } from "@/types/responses/ProductoResponses";
 
 export const useProductos = () => {
 
-  const navigate = useNavigate();
-
-  const [productos, setProductos] = useState<ProductosResponse | null>(null);
-  const [isLoadingProductos, setIsLoadingProductos] = useState(false);
-  const [productosError, setProductosError] = useState<string | null>(null);
-
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
 
-  const fetchProductos = useCallback(async () => {
-    const data = await handleRequest({
-      setLoading: setIsLoadingProductos,
-      setError: setProductosError,
-      onAuthError: () => navigate("/shop"),
-      errorFallback: "Error al cargar productos",
-      request: () => getProductosAsync({
+  const productosQuery = useQuery<ProductosResponse, Error>({
+    queryKey: ["productos", { page, search }],
+    queryFn: async () => {
+      return await getProductosAsync({
         pageNumber: page,
         pageSize: 10,
         searchTerm: search,
         sortBy: "nombre",
         sortDescending: false,
-      }),
-    });
+      });
+    },
+    placeholderData: (previousData) => previousData, 
+  });
 
-    if (data) setProductos(data);
-  }, [navigate, page, search]);
-
-  useEffect(() => {
-    fetchProductos();
-  }, [fetchProductos]);
-  
-  const clearProductosError = () => setProductosError(null);
+  const error = productosQuery.error;
 
   return {
-    productos,
-    isLoadingProductos,
-    productosError,
-    clearProductosError,
+    productos: productosQuery.data ?? null,
+    isLoadingProductos: productosQuery.isLoading,
+    productosError: error ? getErrorMessage(error, "Error al cargar productos") : null,
+    refetchProductos: () => productosQuery.refetch(),
     page,
     setPage,
     search,
     setSearch,
-    fetchProductos,
   };
 };

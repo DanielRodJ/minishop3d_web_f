@@ -1,41 +1,52 @@
 // src/features/admin/hooks/productos/useProducto.ts
 
-import { useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
-import { getProductoAsync } from "@/features/admin/services/ApiProducto";
-import { handleRequest } from "@/utils/requestUtils";
+import {
+  getCantidadPresentacionesAsync,
+  getProductoAsync
+} from "@/features/admin/services/ApiProducto";
 
-import type { ProductoDetalladoResponse } from "@/types/responses/ProductoResponses";
+import { getErrorMessage } from "@/errors/ApiError";
 
-export const useProducto = () => {
+import type {
+  ProductoResponse,
+  CantidadesPresentacionesResponse
+} from "@/types/responses/ProductoResponses";
 
-  const navigate = useNavigate();
+export const useProducto = (productoId: number | undefined) => {
 
-  const [producto, setProducto] = useState<ProductoDetalladoResponse | null>(null);
-  const [isLoadingProducto, setIsLoadingProducto] = useState(false);
-  const [productoError, setProductoError] = useState<string | null>(null);
+  // GetProductoQuery.
+  const productoQuery = useQuery<ProductoResponse, Error>({
+    queryKey: ["producto", productoId],
+    queryFn: async () => {
+      if (!productoId) throw new Error("ID no válido");
+      return await getProductoAsync(productoId);
+    },
+    enabled: !!productoId,
+  });
 
-  const fetchProducto = useCallback(async (id: number) => {
-    const data = await handleRequest({
-      setLoading: setIsLoadingProducto,
-      setError: setProductoError,
-      onAuthError: () => navigate("/shop"),
-      errorFallback: "Error al cargar producto",
-      request: () => getProductoAsync(id),
-    });
+  // GetCantidadPresentacionesQuery.
+  const cantidadPresentacionesQuery = useQuery<CantidadesPresentacionesResponse, Error>({
+    queryKey: ["producto", productoId, "cantidad-presentaciones"],
+    queryFn: async () => {
+      if (!productoId) throw new Error("ID no válido");
+      return await getCantidadPresentacionesAsync(productoId);
+    },
+    enabled: !!productoId,
+    retry: false,
+  });
 
-    if (data) setProducto(data);
-    return data !== null;
-  }, [navigate]);
-
-  const clearProductoError = () => setProductoError(null);
+  const error = productoQuery.error;
 
   return {
-    producto,
-    isLoadingProducto,
-    productoError,
-    clearProductoError,
-    fetchProducto,
+    producto: productoQuery.data ?? null,
+    cantidadPresentaciones: cantidadPresentacionesQuery.data ?? null,
+    isLoadingProducto: productoQuery.isLoading,
+    productoError: error ? getErrorMessage(error, "Error al cargar producto") : null,
+    refetchProducto: () => {
+      productoQuery.refetch();
+      cantidadPresentacionesQuery.refetch();
+    },
   };
 };
