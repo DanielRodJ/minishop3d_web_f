@@ -16,7 +16,7 @@ import type {
 } from "@/types/responses/ProductoPresentacionResponses";
 
 import type {
-  CantidadPresentacionesResponse,
+  CantidadesPresentacionesResponse,
   ProductoDetalladoResponse,
   ProductoIdResponse,
   ProductosResponse
@@ -92,11 +92,10 @@ export const getProductoPresentacionesAsync = (
   );
 };
 
-export const getCantidadPresentacionesAsync = (
-  id: number,
-): Promise<CantidadPresentacionesResponse> => {
-  return api.request<CantidadPresentacionesResponse>(
-    api.private(`${BASE_PATH}/${id}/cantidad-presentaciones`),
+export const getCantidadesPresentacionesAsync = ()
+  : Promise<CantidadesPresentacionesResponse> => {
+  return api.request<CantidadesPresentacionesResponse>(
+    api.private(`${BASE_PATH}/cantidades-presentaciones`),
     "Error al obtener la cantidad de presentaciones"
   );
 };

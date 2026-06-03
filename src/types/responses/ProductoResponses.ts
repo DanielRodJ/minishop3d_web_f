@@ -27,5 +27,7 @@ export type CantidadPresentacionesResponse = {
   cantidadPresentacionesEnEstadoDisponible: number;
 };
 
+export type CantidadesPresentacionesResponse = CantidadPresentacionesResponse[];
+
 export type ProductosResponse = BasePagedResponse<ProductoResponse>;
 export type ProductosDetalladosResponse = BasePagedResponse<ProductoDetalladoResponse>;
