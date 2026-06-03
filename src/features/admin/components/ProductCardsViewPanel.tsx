@@ -1,11 +1,17 @@
 // src/features/admin/components/ProductCardsViewPanel.tsx
 
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "@heroicons/react/24/solid";
 
 import { ButtonCustom } from "@/components/ui/Buttons";
 import { Spinner } from "@/components/ui/Spinner";
 
-import type { ProductoResponse } from "@/types/responses/ProductoResponses";
+import type {
+  ProductoResponse,
+  CantidadesPresentacionesResponse,
+} from "@/types/responses/ProductoResponses";
 
 import { ProductCard } from "@/features/admin/components/ProductCard";
 
@@ -17,20 +23,22 @@ interface ProductCardsViewPanelProps {
     pageSize: number;
     totalPages: number;
   };
+  cantidadesPresentaciones?: CantidadesPresentacionesResponse | null;
   isLoadingProductos?: boolean;
   selectedProductoId?: number;
   onSelectProducto: (producto: ProductoResponse) => void;
-  onRefreshProductos?: () => Promise<void>;
+  onRefreshProductos?: () => void;
   onPageChange?: (page: number) => void;
 }
 
 export const ProductCardsViewPanel = ({
   data,
-  selectedProductoId: selectedProductId,
+  cantidadesPresentaciones,
+  selectedProductoId,
   isLoadingProductos,
-  onSelectProducto: handleSelectCandidate,
-  onRefreshProductos: handleFetchProductosDetallados,
-  onPageChange
+  onRefreshProductos,
+  onSelectProducto,
+  onPageChange,
 }: ProductCardsViewPanelProps) => {
   return (
     <section className="space-y-4">
@@ -47,7 +55,7 @@ export const ProductCardsViewPanel = ({
 
         <ButtonCustom
           preset="reloadData"
-          onClick={handleFetchProductosDetallados}
+          onClick={onRefreshProductos}
         />
       </header>
 
@@ -62,16 +70,28 @@ export const ProductCardsViewPanel = ({
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {data.items.map(pd => (
-              <ProductCard
-                key={pd.productoId}
-                productoDetallado={pd}
-                isSelected={
-                  selectedProductId === pd.productoId
-                }
-                onSelect={() => handleSelectCandidate(pd)}
-              />
-            ))}
+            {data.items.map((pd) => {
+              const cantidades = cantidadesPresentaciones?.find(
+                (c) => c.productoId === pd.productoId
+              );
+
+              return (
+                <ProductCard
+                  key={pd.productoId}
+                  producto={pd}
+                  isSelected={
+                    selectedProductoId === pd.productoId
+                  }
+                  cantidadPresentaciones={
+                    cantidades?.cantidadTotalPresentaciones
+                  }
+                  cantidadPresentacionesDisponibles={
+                    cantidades?.cantidadPresentacionesEnEstadoDisponible
+                  }
+                  onSelect={() => onSelectProducto(pd)}
+                />
+              );
+            })}
           </div>
         )}
       </div>
@@ -80,9 +100,11 @@ export const ProductCardsViewPanel = ({
         <button
           disabled={isLoadingProductos || data.pageNumber === 1}
           onClick={() => onPageChange?.(data.pageNumber - 1)}
-          className="rounded-full bg-zinc-900 p-1 text-white
+          className="
+            rounded-full bg-zinc-900 p-1 text-white
             transition-all duration-200 hover:bg-zinc-800
-            disabled:cursor-not-allowed disabled:opacity-50"
+            disabled:cursor-not-allowed disabled:opacity-50
+          "
         >
           <ChevronLeftIcon className="size-4" />
         </button>
@@ -104,13 +126,15 @@ export const ProductCardsViewPanel = ({
             data.pageNumber === data.totalPages
           }
           onClick={() => onPageChange?.(data.pageNumber + 1)}
-          className="rounded-full bg-zinc-900 p-1 text-white
+          className="
+            rounded-full bg-zinc-900 p-1 text-white
             transition-all duration-200 hover:bg-zinc-800
-            disabled:cursor-not-allowed disabled:opacity-50"
+            disabled:cursor-not-allowed disabled:opacity-50
+          "
         >
           <ChevronRightIcon className="size-4" />
         </button>
       </footer>
     </section>
   );
-}
+};
