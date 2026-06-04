@@ -1,28 +1,35 @@
 // src/features/admin/hooks/useProductPresentationForms.ts
 
+// Librerías externas.
 import { useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { getErrorMessage } from "@/errors/ApiError";
-import { ValidationError } from "@/errors/ValidationError";
-
+// Hooks.
 import { useFormBase } from "@/features/admin/hooks/useFormBase";
 
+// Schemas.
 import {
     addProductoPresentacionSchema,
     updateProductoPresentacionSchema
 } from "@/features/admin/schemas/productSchemas";
 
+// Servicios.
 import {
     addProductoPresentacionAsync,
     calculateProductoPresentacionAsync,
     updateProductoPresentacionAsync
 } from "@/features/admin/services/ApiProductoPresentacion";
 
+// Utils.
+import { getErrorMessage } from "@/errors/ApiError";
+import { ValidationError } from "@/errors/ValidationError";
+
 import {
     getApiFieldErrors,
     getZodFieldErrors
 } from "@/features/admin/utils/formErrorsUtils";
 
+// Types.
 import type {
     AddProductoPresentacionCommand,
     UpdateProductoPresentacionCommand
@@ -73,15 +80,13 @@ type AddPresentacionProps = SubmitProps & {
 
 // hook para manejo completo del formulario de creación de presentaciones:
 // estado, validación, envío y manejo de errores.
-export const useAddProductoPresentacionForm = ({
+export const useAddProductoPresentacionMutation = ({
     productoId,
     onSuccess
 }: AddPresentacionProps) => {
 
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const queryClient = useQueryClient();
     const [submitError, setSubmitError] = useState<string | null>(null);
-
-    const [isCalculating, setIsCalculating] = useState(false);
 
     const {
         formData,
@@ -93,7 +98,7 @@ export const useAddProductoPresentacionForm = ({
     } = useFormBase<AddProductoPresentacionCommand>({
         initialState: getInitialProductoPresentacion(productoId),
         numericFields
-    })
+    });
 
     // para cambio de entidad sobre la que se consultan las presentaciones.
     useEffect(() => {
@@ -101,6 +106,14 @@ export const useAddProductoPresentacionForm = ({
         setFieldErrors({});
         setSubmitError(null);
     }, [productoId, setFormData, setFieldErrors]);
+
+    const addPresentacionMutation = useMutation({
+        mutationFn: addProductoPresentacionAsync,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["producto", productoId, "presentaciones-listado"] });
+            await queryClient.invalidateQueries({ queryKey: ["productos", "cantidades-presentaciones"] });
+        }
+    });
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -114,10 +127,8 @@ export const useAddProductoPresentacionForm = ({
             return;
         }
 
-        setIsSubmitting(true);
-
         try {
-            await addProductoPresentacionAsync(formData);
+            await addPresentacionMutation.mutateAsync(formData);
             await onSuccess?.();
             setFormData(getInitialProductoPresentacion(productoId));
         } catch (error) {
@@ -126,27 +137,24 @@ export const useAddProductoPresentacionForm = ({
             }
 
             setSubmitError(getErrorMessage(error, "Error al crear presentacion"));
-        } finally {
-            setIsSubmitting(false);
         }
     };
 
-    const handleCalculatePrice = async () => {
+    const calculateMutation = useMutation({
+        mutationFn: calculateProductoPresentacionAsync
+    });
 
+    const handleCalculatePrice = async () => {
         setSubmitError(null);
 
-        setIsCalculating(true);
-
         try {
-
-            const precioVenta =
-                await calculateProductoPresentacionAsync({
-                    filamentoId: formData.filamentoId,
-                    escalaCodigo: formData.escalaCodigo,
-                    tiempoImpresionMinutos: formData.tiempoImpresionMinutos,
-                    cantidadGramosFilamentoUso: formData.cantidadGramosFilamentoUso,
-                    costoProduccionAdicional: formData.costoProduccionAdicional
-                });
+            const precioVenta = await calculateMutation.mutateAsync({
+                filamentoId: formData.filamentoId,
+                escalaCodigo: formData.escalaCodigo,
+                tiempoImpresionMinutos: formData.tiempoImpresionMinutos,
+                cantidadGramosFilamentoUso: formData.cantidadGramosFilamentoUso,
+                costoProduccionAdicional: formData.costoProduccionAdicional
+            });
 
             setFormData(prev => ({
                 ...prev,
@@ -154,16 +162,12 @@ export const useAddProductoPresentacionForm = ({
             }));
 
         } catch (error) {
-
             setSubmitError(
                 getErrorMessage(
                     error,
                     "Error al calcular precio de venta"
                 )
             );
-
-        } finally {
-            setIsCalculating(false);
         }
     };
 
@@ -177,8 +181,8 @@ export const useAddProductoPresentacionForm = ({
         handleSubmit,
         handleCalculatePrice,
 
-        isSubmitting,
-        isCalculating
+        isSubmitting: addPresentacionMutation.isPending,
+        isCalculating: calculateMutation.isPending
     };
 };
 
@@ -186,14 +190,14 @@ type UpdatePresentacionProps = SubmitProps & {
     initialData: UpdateProductoPresentacionCommand;
 };
 
-export const useUpdateProductoPresentacionForm = ({
+export const useUpdateProductoPresentacionMutation = ({
     initialData,
     onSuccess
 }: UpdatePresentacionProps) => {
-    
-    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const [submitError, setSubmitError] = useState<string | null>(null);
-    const [isCalculating, setIsCalculating] = useState(false);
+
+    const queryClient = useQueryClient();
 
     const {
         formData,
@@ -213,6 +217,14 @@ export const useUpdateProductoPresentacionForm = ({
         setSubmitError(null);
     }, [initialData, setFormData, setFieldErrors]);
 
+    const updatePresentacionMutation = useMutation({
+        mutationFn: updateProductoPresentacionAsync,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["producto", initialData.productoId, "presentaciones-listado"] });
+            await queryClient.invalidateQueries({ queryKey: ["productos", "cantidades-presentaciones"] });
+        }
+    });
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setSubmitError(null);
@@ -225,10 +237,8 @@ export const useUpdateProductoPresentacionForm = ({
             return;
         }
 
-        setIsSubmitting(true);
-
         try {
-            await updateProductoPresentacionAsync(formData);
+            await updatePresentacionMutation.mutateAsync(formData);
             await onSuccess?.();
         } catch (error) {
             if (error instanceof ValidationError) {
@@ -236,27 +246,26 @@ export const useUpdateProductoPresentacionForm = ({
             }
 
             setSubmitError(getErrorMessage(error, "Error al actualizar presentacion"));
-        } finally {
-            setIsSubmitting(false);
         }
     };
 
-    
+
+    const calculateMutation = useMutation({
+        mutationFn: calculateProductoPresentacionAsync
+    });
+
     const handleCalculatePrice = async () => {
 
         setSubmitError(null);
 
-        setIsCalculating(true);
-
         try {
-            const precioVenta =
-                await calculateProductoPresentacionAsync({
-                    filamentoId: formData.filamentoId,
-                    escalaCodigo: formData.escalaCodigo,
-                    tiempoImpresionMinutos: formData.tiempoImpresionMinutos,
-                    cantidadGramosFilamentoUso: formData.cantidadGramosFilamentoUso,
-                    costoProduccionAdicional: formData.costoProduccionAdicional
-                });
+            const precioVenta = await calculateMutation.mutateAsync({
+                filamentoId: formData.filamentoId,
+                escalaCodigo: formData.escalaCodigo,
+                tiempoImpresionMinutos: formData.tiempoImpresionMinutos,
+                cantidadGramosFilamentoUso: formData.cantidadGramosFilamentoUso,
+                costoProduccionAdicional: formData.costoProduccionAdicional
+            });
 
             setFormData(prev => ({
                 ...prev,
@@ -272,8 +281,6 @@ export const useUpdateProductoPresentacionForm = ({
                 )
             );
 
-        } finally {
-            setIsCalculating(false);
         }
     };
 
@@ -281,13 +288,11 @@ export const useUpdateProductoPresentacionForm = ({
         formData,
         fieldErrors,
         submitError,
-
         handleChange,
         handleSelectChange,
         handleSubmit,
         handleCalculatePrice,
-
-        isSubmitting,
-        isCalculating
+        isSubmitting: updatePresentacionMutation.isPending,
+        isCalculating: calculateMutation.isPending
     };
 };
