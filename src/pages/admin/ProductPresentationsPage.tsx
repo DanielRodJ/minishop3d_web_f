@@ -1,21 +1,40 @@
 // src/pages/admin/ProductPresentationsPage.tsx
 
+// Librerías externas.
 import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import { PlusIcon } from "@heroicons/react/24/solid";
-import { useQuery } from "@tanstack/react-query";
 
-import { FormProductPresentation } from "@/features/admin/components/FormsProductPresentation";
-import { getInitialProductoPresentacion, useAddProductoPresentacionForm, useUpdateProductoPresentacionForm } from "@/features/admin/hooks/useProductPresentationForm";
-import { useProducto } from "@/features/admin/hooks/productos/useProducto";
-import { getErrorMessage } from "@/errors/ApiError";
+// Componentes.
 import { Spinner } from "@/components/ui/Spinner";
 import { Toast } from "@/components/ui/Toast";
-import { getEscalas, getEstadosProducto, getFilamentos } from "@/services/ApiCatalogo";
-import type { ProductoPresentacionResponse } from "@/types/responses/ProductoPresentacionResponses";
+
+import { FormProductPresentation } from "@/features/admin/components/FormsProductPresentation";
+import { ProductPresentationCard } from "@/features/admin/components/ProductPresentationCard";
+
+// Hooks.
+import { useProducto } from "@/features/admin/hooks/productos/useProducto";
+import {
+  getInitialProductoPresentacion,
+  useAddProductoPresentacionForm,
+  useUpdateProductoPresentacionForm
+} from "@/features/admin/hooks/useProductPresentationForm";
+
+// Servicios.
+import {
+  getEscalas,
+  getEstadosProducto,
+  getFilamentos
+} from "@/services/ApiCatalogo";
+
+// Utils.
+import { getErrorMessage } from "@/errors/ApiError";
+
+// Types.
 import type { SelectOption } from "@/components/shared/inputs/Dropdown";
 import type { UpdateProductoPresentacionCommand } from "@/types/ProductoPresentacionCommands";
-import { ProductPresentationCard } from "@/features/admin/components/ProductPresentationCard";
+import type { ProductoPresentacionResponse } from "@/types/responses/ProductoPresentacionResponses";
 
 const EMPTY_UPDATE_PRESENTACION: UpdateProductoPresentacionCommand = {
   productoPresentacionId: 0,
