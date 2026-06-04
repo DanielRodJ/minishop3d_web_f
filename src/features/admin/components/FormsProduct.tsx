@@ -67,31 +67,31 @@ export const FormProducto = ({
 
             <div>
               <InputText
-                id="nombre"
-                name="nombre"
+                id="nombreProducto"
+                name="nombreProducto"
                 placeholder="Nombre del producto"
                 value={formData.nombreProducto}
                 onChange={handleChange}
-                variant={fieldErrors.nombre ? "error" : "default"}
+                variant={fieldErrors.nombreProducto ? "error" : "default"}
                 disabled={disabled}
               />
-              {fieldErrors.nombre && (
-                <ErrorMessage message={fieldErrors.nombre} />
+              {fieldErrors.nombreProducto && (
+                <ErrorMessage message={fieldErrors.nombreProducto} />
               )}
             </div>
 
             <div>
               <InputTextArea
-                id="descripcion"
-                name="descripcion"
+                id="descripcionProducto"
+                name="descripcionProducto"
                 placeholder="Descripción del producto"
                 value={formData.descripcionProducto}
                 onChange={handleChange}
-                className={fieldErrors.descripcion ? "border-red-500 focus:ring-red-500" : ""}
+                className={fieldErrors.descripcionProducto ? "border-red-500 focus:ring-red-500" : ""}
                 disabled={disabled}
               />
-              {fieldErrors.descripcion && (
-                <ErrorMessage message={fieldErrors.descripcion} />
+              {fieldErrors.descripcionProducto && (
+                <ErrorMessage message={fieldErrors.descripcionProducto} />
               )}
             </div>
 
