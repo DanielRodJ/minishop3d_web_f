@@ -30,7 +30,7 @@ import type {
 
 // método para mapear response a command.
 // preparación de datos para mostrar en formulario.
-function buildUpdateProductoCommand(
+function mapProductoDetalladoToCommand(
   p: ProductoDetalladoResponse
 ): UpdateProductoCommand {
   return {
@@ -114,7 +114,7 @@ export const ProductsManagementPage = () => {
   const updateInitialUpdateFormData = useMemo(
     () =>
       producto
-        ? buildUpdateProductoCommand(producto)
+        ? mapProductoDetalladoToCommand(producto)
         : EMPTY_UPDATE_PRODUCTO_FORM,
     [producto]
   );
