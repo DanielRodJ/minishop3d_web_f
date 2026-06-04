@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { PlusIcon, PencilIcon } from "@heroicons/react/24/solid";
+import { PlusIcon } from "@heroicons/react/24/solid";
 import { useQuery } from "@tanstack/react-query";
 
 import { FormProductPresentation } from "@/features/admin/components/FormsProductPresentation";
@@ -15,6 +15,7 @@ import { getEscalas, getEstadosProducto, getFilamentos } from "@/services/ApiCat
 import type { ProductoPresentacionResponse } from "@/types/responses/ProductoPresentacionResponses";
 import type { SelectOption } from "@/components/shared/inputs/Dropdown";
 import type { UpdateProductoPresentacionCommand } from "@/types/ProductoPresentacionCommands";
+import { ProductPresentationCard } from "@/features/admin/components/ProductPresentationCard";
 
 const EMPTY_UPDATE_PRESENTACION: UpdateProductoPresentacionCommand = {
   productoPresentacionId: 0,
@@ -176,9 +177,10 @@ export const ProductPresentationsPage = () => {
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {presentations.map((presentation) => (
-            <PresentationCard
+            <ProductPresentationCard
               key={presentation.productoPresentacionId}
-              presentation={presentation}
+              productoPresentacion={presentation}
+              editable={true}
               onEdit={() => setSelectedPresentation(presentation)}
             />
           ))}
@@ -227,55 +229,6 @@ export const ProductPresentationsPage = () => {
         </div>
       )}
     </section>
-  );
-};
-
-type PresentationCardProps = {
-  presentation: ProductoPresentacionResponse;
-  onEdit: () => void;
-};
-
-const PresentationCard = ({ presentation, onEdit }: PresentationCardProps) => {
-  const scaleLabel =
-    presentation.escalaCodigo;
-  const statusLabel =
-    presentation.estadoProductoPresentacionCodigo;
-  const filamentLabel =
-    presentation.filamento?.display ?? `Filamento ${presentation.filamentoId}`;
-
-  return (
-    <article className="relative rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="mb-3 h-28 rounded-md bg-slate-100" />
-      <div className="space-y-1 text-sm">
-        <h2 className="font-semibold text-slate-900">{scaleLabel}</h2>
-        <p className="text-slate-500">{filamentLabel}</p>
-        <p className="text-slate-600">
-          {presentation.dimensionX} x {presentation.dimensionY} x {presentation.dimensionZ} mm
-        </p>
-        <p className="text-slate-600">
-          {presentation.cantidadGramosFilamentoUso} g · {presentation.tiempoImpresionMinutos} min
-        </p>
-        <div className="flex items-center justify-between pt-2">
-          <div className="flex items-center gap-2">
-            <span className="rounded bg-slate-100 px-2 py-1 text-xs text-slate-600">
-              {statusLabel}
-            </span>
-            <span className="text-sm font-semibold text-slate-900">
-              ${presentation.precioVenta}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <button
-        type="button"
-        onClick={onEdit}
-        className="absolute bottom-3 right-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-black text-white hover:bg-slate-700"
-        aria-label="Editar presentación"
-      >
-        <PencilIcon className="h-4 w-4" />
-      </button>
-    </article>
   );
 };
 

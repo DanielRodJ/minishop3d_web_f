@@ -58,6 +58,7 @@ export const ProductPresentationsViewPanel = ({
                             <ProductPresentationCard
                                 key={pp.productoPresentacionId}
                                 productoPresentacion={pp}
+                                editable={false}
                             />
                         ))}
                     </div>
