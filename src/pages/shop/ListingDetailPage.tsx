@@ -1,3 +1,5 @@
+// src/pages/shop/ListingDetailPage.tsx
+
 function ListingDetailPage() {
   return <div>ListingDetailPage</div>;
 }

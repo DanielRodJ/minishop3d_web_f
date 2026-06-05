@@ -1,7 +1,14 @@
-import type { Character } from "@/types/models/ProductoModels";
+// src/pages/shop/ShopPage.tsx
+
+// Assets.
+import miniatureSample from "@/assets/miniature_sample.webp";
+
+// Componentes.
 import HeroCarousel from "@/components/shared/HeroCarousel";
 import ProductSection from "@/components/ProductSection";
-import miniatureSample from '@/assets/miniature_sample.webp';
+
+// Types.
+import type { Character } from "@/types/models/ProductoModels";
 
 function ShopPage() {
 
