@@ -9,13 +9,13 @@ import {
   getEstadosProducto,
   getEstadosPublicacion,
   getFilamentos
-} from "@/services/ApiCatalogo";
+} from "@/services/apiCatalogo";
 
 // Utils.
 import { getErrorMessage } from "@/errors/ApiError";
 
 // Types.
-import type { CatalogoResponse } from "@/services/ApiCatalogo";
+import type { CatalogoResponse } from "@/types/responses/CatalogoResponses";
 import type { FilamentoResponse } from "@/types/responses/FilamentoResponses";
 
 const CATALOG_STALE_TIME = 60 * 60 * 1000;

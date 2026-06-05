@@ -1,6 +1,9 @@
-// src/services/ApiClient
+// src/services/apiClient
 
-import { auth } from "./Firebase";
+// Servicios.
+import { auth } from "@/services/firebase";
+
+// Errores.
 import { ApiError } from "@/errors/ApiError";
 import { AuthError } from "@/errors/AuthError";
 import { throwApiError } from "@/errors/throwApiError";

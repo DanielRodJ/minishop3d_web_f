@@ -1,5 +1,7 @@
+// src/features/auth/services/AuthService.ts
+
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
-import { auth } from "../../../services/Firebase";
+import { auth } from "@/services/firebase";
 
 export const loginWithGoogle = async () => {
     try {

@@ -1,4 +1,6 @@
-import { api } from "../../../services/ApiClient";
+// src/features/auth/services/UserApi.ts
+
+import { api } from "@/services/apiClient";
 
 export type UsuarioBaseDto = {
     usuarioId: number;

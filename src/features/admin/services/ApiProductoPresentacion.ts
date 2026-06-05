@@ -1,6 +1,6 @@
 // src/features/admin/services/ApiProductoPresentacion.ts
 
-import { api } from "@/services/ApiClient";
+import { api } from "@/services/apiClient";
 
 import type { BaseQueryParams } from "@/types/shared/BaseQueryParams";
 
