@@ -1,16 +1,25 @@
 // src/pages/admin/ProductsManagementPage.tsx
 
+// Librerías externas.
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+// Componentes.
 import { SearchBarCustom } from "@/components/shared/SearchBarComponents";
 import { ButtonCustom } from "@/components/ui/Buttons";
 import { Spinner } from "@/components/ui/Spinner";
 import { Toast } from "@/components/ui/Toast";
 
+import { DataState } from "@/features/admin/DataState";
+
 import { FiltersComponent } from "@/features/admin/components/FiltersComponent";
 import { FormProducto } from "@/features/admin/components/FormsProduct";
+import { Pagination } from "@/features/admin/components/Pagination";
 import { Table, type Column } from "@/features/admin/components/TableTemplate";
+
+// Hooks.
+import { useProducto } from "@/features/admin/hooks/productos/useProducto";
+import { useProductos } from "@/features/admin/hooks/productos/useProductos";
 
 import {
   getInitialProducto,
@@ -18,9 +27,7 @@ import {
   useUpdateProductoMutation,
 } from "@/features/admin/hooks/productos/useProductoMutations";
 
-import { useProducto } from "@/features/admin/hooks/productos/useProducto";
-import { useProductos } from "@/features/admin/hooks/productos/useProductos";
-
+// Types.
 import type { UpdateProductoCommand } from "@/types/ProductoCommand";
 
 import type {
@@ -64,6 +71,10 @@ export const ProductsManagementPage = () => {
     productosError,
     setPage,
     setSearch,
+    sortBy,
+    setSortBy,
+    sortDescending,
+    setSortDescending
   } = useProductos();
 
   const {
@@ -77,20 +88,21 @@ export const ProductsManagementPage = () => {
   );
 
   const columnsTable = [
-    { header: "ID", key: "productoId" },
-    { header: "Nombre", key: "nombreProducto" },
+    { header: "ID", accessor: "productoId" },
+    { header: "NOMBRE", accessor: "nombreProducto", sortKey: "nombre" },
     {
-      header: "Colección",
+      header: "COLECCIÓN",
       render: (p: ProductoResponse) => p.coleccion?.nombre ?? "-"
     },
-    { header: "Autor", key: "autorNombre" },
+    { header: "AUTOR", accessor: "autorNombre", sortKey: "autor"},
     {
-      header: "Fecha",
+      header: "FECHA",
+      sortKey: "fecha",
       render: (p: ProductoResponse) =>
-        new Date(p.fechaLanzamiento).toLocaleDateString()
+        new Date(p.fechaLanzamiento).toLocaleDateString(),
     },
     {
-      header: "Opciones",
+      header: "OPCIONES",
       render: (p: ProductoResponse) => (
         <div className="flex gap-1.5">
           <ButtonCustom
@@ -153,6 +165,23 @@ export const ProductsManagementPage = () => {
     setPage(1);
   }, [setPage, setSearch]);
 
+  // método para actualización de término de ordenamiento y dirección.
+  const handleSort = (column: string) => {
+    if (sortBy !== column) {
+      setSortBy(column);
+      setSortDescending(false);
+      return;
+    }
+
+    if (sortDescending === false) {
+      setSortDescending(true);
+      return;
+    }
+
+    setSortBy(undefined);
+    setSortDescending(undefined);
+  };
+
   // método de botón para abrir modal en base a id asociado.
   const handleOpenModifyRecordForm = (id: number) => {
     setSelectedProductoId(id);
@@ -168,7 +197,7 @@ export const ProductsManagementPage = () => {
   return (
     <div className="relative flex">
       <header className="w-full rounded-md border border-slate-200 bg-white p-2">
-        <h1 className="text-lg font-bold text-black">
+        <h1 className="text-lg font-bold text-black pl-2">
           Productos registrados
         </h1>
 
@@ -193,26 +222,30 @@ export const ProductsManagementPage = () => {
           />
         </div>
 
-        {isLoadingProductos ? (
-          <div className="flex justify-center py-10">
-            <Spinner />
-          </div>
-        ) : productosError ? (
-          <div className="p-4 text-center text-red-600">
-            {productosError}
-          </div>
-        ) : productos && productos.items.length > 0 ? (
-          <Table
-            columns={columnsTable}
-            data={productos}
-            onPageChange={setPage}
-            getRowId={(p) => p.productoId}
-          />
-        ) : productos && productos.items.length === 0 ? (
-          <div className="p-4 text-center">
-            No hay productos registrados
-          </div>
-        ) : null}
+        <DataState
+          isLoading={isLoadingProductos}
+          error={productosError}
+        >
+          {productos && (
+            <div className="space-y-3">
+              <Table
+                columns={columnsTable}
+                data={productos.items}
+                getRowId={(p) => p.productoId}
+                sortBy={sortBy}
+                sortDescending={sortDescending}
+                onSort={handleSort}
+              />
+
+              <Pagination
+                pageNumber={productos.pageNumber}
+                totalPages={productos.totalPages}
+                onPageChange={setPage}
+              />
+            </div>
+          )}
+        </DataState>
+
       </header>
 
       <FiltersComponent filtersAreOpen={areFiltersOpen} />

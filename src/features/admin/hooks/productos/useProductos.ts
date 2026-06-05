@@ -11,17 +11,19 @@ export const useProductos = () => {
 
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<string>();
+  const [sortDescending, setSortDescending] = useState<boolean>();
 
   // GetProductosQuery.
   const productosQuery = useQuery<ProductosResponse, Error>({
-    queryKey: ["productos", "lista", { page, search }],
+    queryKey: ["productos", "lista", { page, search, sortBy, sortDescending }],
     queryFn: async () => {
       return await getProductosAsync({
         pageNumber: page,
         pageSize: 10,
         searchTerm: search,
-        sortBy: "nombre",
-        sortDescending: false,
+        sortBy: sortBy,
+        sortDescending: sortDescending,
       });
     },
     placeholderData: (previousData) => previousData,
@@ -46,5 +48,9 @@ export const useProductos = () => {
     setPage,
     search,
     setSearch,
+    sortBy,
+    setSortBy,
+    sortDescending,
+    setSortDescending
   };
 };
