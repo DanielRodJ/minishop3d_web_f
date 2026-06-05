@@ -9,7 +9,7 @@ import { InputTextArea } from "@/components/shared/inputs/InputTextArea";
 
 import type { FieldErrors } from "@/errors/ApiError";
 
-import type { AddProductoCommand } from "@/types/ProductoCommand";
+import type { AddProductoCommand } from "@/types/commands/ProductoCommands";
 
 type ProductoFormData = AddProductoCommand & { productoId?: number };
 

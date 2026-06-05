@@ -1,4 +1,4 @@
-import type { Character } from '../types/ProductType';
+import type { Character } from '@/types/models/ProductoModels';
 import { ButtonCustom } from './ui/Buttons';
 
 interface Props {

@@ -33,7 +33,7 @@ import {
 import type {
     AddProductoPresentacionCommand,
     UpdateProductoPresentacionCommand
-} from "@/types/ProductoPresentacionCommands";
+} from "@/types/commands/ProductoPresentacionCommands";
 
 // campos númericos
 const numericFields = new Set([

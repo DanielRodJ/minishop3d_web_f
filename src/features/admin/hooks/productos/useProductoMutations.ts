@@ -29,7 +29,7 @@ import {
 import type {
   AddProductoCommand,
   UpdateProductoCommand,
-} from "@/types/ProductoCommand";
+} from "@/types/commands/ProductoCommands";
 
 // creación de estado inicial vacío de Producto.
 export const getInitialProducto = (): AddProductoCommand => ({

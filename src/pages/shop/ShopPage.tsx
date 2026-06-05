@@ -1,4 +1,4 @@
-import type { Character } from "@/types/ProductType";
+import type { Character } from "@/types/models/ProductoModels";
 import HeroCarousel from "@/components/shared/HeroCarousel";
 import ProductSection from "@/components/ProductSection";
 import miniatureSample from '@/assets/miniature_sample.webp';

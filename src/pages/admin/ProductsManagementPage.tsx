@@ -28,7 +28,7 @@ import {
 } from "@/features/admin/hooks/productos/useProductoMutations";
 
 // Types.
-import type { UpdateProductoCommand } from "@/types/ProductoCommand";
+import type { UpdateProductoCommand } from "@/types/commands/ProductoCommands";
 
 import type {
   ProductoDetalladoResponse,

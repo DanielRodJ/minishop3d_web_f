@@ -1,6 +1,6 @@
 // src/types/responses/PublicacionResponses.ts
 
-import type { BasePagedResponse } from "@/types/BasePagedResponse";
+import type { BasePagedResponse } from "@/types/shared/BasePagedResponse";
 
 export type PublicacionResponse = {
   publicacionId: number;

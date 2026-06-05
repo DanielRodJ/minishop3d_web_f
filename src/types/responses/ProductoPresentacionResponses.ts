@@ -1,7 +1,7 @@
 // src/types/responses/ProductoPresentacionResponses.ts
 
 import type { FilamentoResponse } from "@/types/responses/FilamentoResponses";
-import type { BasePagedResponse } from "@/types/BasePagedResponse";
+import type { BasePagedResponse } from "@/types/shared/BasePagedResponse";
 
 export type ProductoPresentacionResponse = {
   productoPresentacionId: number;

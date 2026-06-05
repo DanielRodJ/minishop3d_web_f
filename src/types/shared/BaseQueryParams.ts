@@ -1,3 +1,5 @@
+// src/types/shared/BasePagedResponse
+
 export type BaseQueryParams = {
   pageNumber?: number;
   pageSize?: number;

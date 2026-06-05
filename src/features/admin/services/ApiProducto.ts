@@ -4,12 +4,12 @@ import { api } from "@/services/ApiClient";
 
 import type {
   BaseQueryParams
-} from "@/types/BaseQueryParams";
+} from "@/types/shared/BaseQueryParams";
 
 import type {
   AddProductoCommand,
   UpdateProductoCommand,
-} from "@/types/ProductoCommand";
+} from "@/types/commands/ProductoCommands";
 
 import type {
   ProductoPresentacionesResponse

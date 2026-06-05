@@ -1,4 +1,4 @@
-// src/types/PublicacionCommand.ts
+// src/types/commands/PublicacionCommand.ts
 
 export interface AddPublicacionCommand {
   tituloPublicacion: string;

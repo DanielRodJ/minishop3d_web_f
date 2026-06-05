@@ -1,4 +1,4 @@
-// src/types/ProductoCommands.ts
+// src/types/commands/ProductoCommands.ts
 
 export interface AddProductoCommand {
   nombreProducto: string;

@@ -1,4 +1,4 @@
-// src/types/ProductoPresentacionCommmands.ts
+// src/types/commands/ProductoPresentacionCommmands.ts
 
 export interface AddProductoPresentacionCommand {
   productoId: number;

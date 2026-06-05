@@ -7,7 +7,7 @@ import type { FieldErrors } from "@/errors/ApiError";
 import { ErrorMessage } from "@/components/shared/feedback/ErrorMessage";
 import { Dropdown, type SelectOption } from "@/components/shared/inputs/Dropdown";
 import { InputNumber } from "@/components/shared/inputs/InputNumber";
-import type { AddProductoPresentacionCommand } from "@/types/ProductoPresentacionCommands";
+import type { AddProductoPresentacionCommand } from "@/types/commands/ProductoPresentacionCommands";
 
 type PresentacionFormData = AddProductoPresentacionCommand & {
   productoPresentacionId?: number;

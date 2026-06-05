@@ -1,7 +1,7 @@
 // src/types/responses/CatalogoResponses.ts
 
-export type CatalogoDto = {
-  codigo: string;
+export type CatalogoResponse = {
   nombre: string;
+  codigo: string;
   numero?: number;
 };

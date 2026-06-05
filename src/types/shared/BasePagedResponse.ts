@@ -1,4 +1,4 @@
-// src/types/BasePagedResponse
+// src/types/shared/BasePagedResponse
 
 export type BasePagedResponse<T> = {
   items: T[];

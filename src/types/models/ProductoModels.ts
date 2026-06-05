@@ -1,3 +1,5 @@
+// src/types/models/ProductoModels
+
 export interface BaseProduct {
   id: string;
   name: string;

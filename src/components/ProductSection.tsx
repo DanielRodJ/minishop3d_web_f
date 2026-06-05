@@ -1,5 +1,5 @@
+import type { Character } from "@/types/models/ProductoModels";
 import { CardMiniature } from "./CardMiniature";
-import type { Character } from "../types/ProductType";
 
 interface Props {
   products: Character[];

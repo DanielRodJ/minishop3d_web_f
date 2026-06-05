@@ -2,13 +2,13 @@
 
 import { api } from "@/services/ApiClient";
 
-import type { BaseQueryParams } from "@/types/BaseQueryParams";
+import type { BaseQueryParams } from "@/types/shared/BaseQueryParams";
 
 import type {
     AddProductoPresentacionCommand,
     CalculateProductoPresentacionCommand,
     UpdateProductoPresentacionCommand
-} from "@/types/ProductoPresentacionCommands";
+} from "@/types/commands/ProductoPresentacionCommands";
 
 import type { ProductoPresentacionResponse } from "@/types/responses/ProductoPresentacionResponses";
 

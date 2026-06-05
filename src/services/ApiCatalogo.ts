@@ -1,13 +1,9 @@
 // src/services/ApiCatalogs.ts
 
 import { api } from "@/services/ApiClient";
+import type { CatalogoResponse } from "@/types/responses/CatalogoResponses";
 import type { FilamentoResponse } from "@/types/responses/FilamentoResponses";
 
-export type CatalogoResponse = {
-  nombre: string;
-  codigo: string;
-  numero?: number;
-};
 
 const CATALOG_BASE = "/minisho3d/catalogo";
 
