@@ -1,24 +1,26 @@
 // src/features/admin/services/ApiProductoPresentacion.ts
 
+// Servicios.
 import { api } from "@/services/apiClient";
 
-import type { BaseQueryParams } from "@/types/shared/BaseQueryParams";
-
+// Types.
 import type {
     AddProductoPresentacionCommand,
     CalculateProductoPresentacionCommand,
     UpdateProductoPresentacionCommand
 } from "@/types/commands/ProductoPresentacionCommands";
 
-import type { ProductoPresentacionResponse } from "@/types/responses/ProductoPresentacionResponses";
+import type {
+    ProductoPresentacionResponse,
+    ProductoPresentacionesResponse
+} from "@/types/responses/ProductoPresentacionResponses";
 
-type ResponseTemporal = {
-}
+import type { BaseQueryParams } from "@/types/shared/BaseQueryParams";
 
 const BASE_PATH = "/minisho3d/producto-presentacion";
 
 export const getProductoPresentacionAsync = (id: number) => {
-    return api.request<ResponseTemporal>(
+    return api.request<ProductoPresentacionResponse>(
         api.private(`${BASE_PATH}/${id}`),
         "Error al obtener la presentación"
     );
@@ -46,7 +48,7 @@ export const updateProductoPresentacionAsync = (data: UpdateProductoPresentacion
 
 export const getProductosPresentacionesAsync = (
     params?: BaseQueryParams
-): Promise<ResponseTemporal> => {
+): Promise<ProductoPresentacionesResponse> => {
     const query = new URLSearchParams();
 
     if (params?.pageNumber) query.append("pageNumber", params.pageNumber.toString());
@@ -58,7 +60,7 @@ export const getProductosPresentacionesAsync = (
         query.append("sortDescending", params.sortDescending.toString());
     }
 
-    return api.request<ResponseTemporal>(
+    return api.request<ProductoPresentacionesResponse>(
         api.private(`${BASE_PATH}/productos?${query.toString()}`),
         "Error al obtener productos"
     );
