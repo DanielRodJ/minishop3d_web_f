@@ -1,10 +1,12 @@
-import { Outlet } from "react-router-dom";
-import { NavigationBar } from "../features/admin/components/AdminNavigationBar";
+// src/layouts/AdminLayout
 
+// Librerías externas.
+import { Outlet } from "react-router-dom";
+
+// Componentes.
+import { NavigationBar } from "@/features/admin/components/AdminNavigationBar";
 
 export const AdminLayout = () => {
-
-
     return (
         <div className="grid grid-cols-[250px_1fr] min-h-screen">
             <NavigationBar />

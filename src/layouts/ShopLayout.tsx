@@ -1,7 +1,9 @@
 // src/layouts/ShopLayaout.tsx
 
+// Librerías externas.
 import { Outlet } from "react-router-dom";
 
+// Componentes.
 import { ShopNavigationBar } from "@/features/shop/components/ShopNavigationBar";
 import { ShopFooter } from "@/features/shop/components/ShopFooter";
 
