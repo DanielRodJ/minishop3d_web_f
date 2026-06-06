@@ -11,7 +11,6 @@ import { ShopLayout } from "@/layouts/ShopLayout";
 import { HomePage } from "@/pages/admin/HomePage";
 import { ProductsManagementPage } from "@/pages/admin/ProductsManagementPage";
 import { ProductPresentationsPage } from "@/pages/admin/ProductPresentationsPage";
-import { temporal as LoginPage } from "@/pages/auth/LoginPage";
 import ErrorPage from "@/pages/auth/ErrorPage";
 import ShopPage from "@/pages/shop/ShopPage";
 import PostDetailPage from "@/pages/shop/ListingDetailPage";
@@ -41,10 +40,6 @@ const queryClient = new QueryClient({
 });
 
 const router = createBrowserRouter([
-  {
-    path: "/login",
-    element: <LoginPage />,
-  },
   {
     path: "/shop",
     element: <ShopLayout />,
