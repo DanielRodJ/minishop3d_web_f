@@ -1,10 +1,10 @@
-// src/features/auth/services/AuthApi.ts
+// src/features/auth/services/apiAuth.ts
 
+// Servicios.
 import { api } from "@/services/apiClient";
 
-export type LoginResponse = {
-  success: boolean;
-};
+// Types.
+import type { LoginResponse } from "@/types/responses/LoginResponse";
 
 export const loginWithBackend = async (): Promise<LoginResponse> => {
   const response = await api.private("/minisho3d/auth/login", {

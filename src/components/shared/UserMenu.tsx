@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { UserCircleIcon } from '@heroicons/react/24/outline';
 
 import { useAuth } from '../../context/AuthContext';
-import { loginWithGoogle, logout } from '../../features/auth/services/AuthService';
-import { loginWithBackend } from '../../features/auth/services/AuthApi';
+import { loginWithGoogle, logout } from '@/features/auth/services/firebaseAuth';
+import { loginWithBackend } from '@/features/auth/services/apiAuth';
 
 interface ItemMenuProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   text: string;

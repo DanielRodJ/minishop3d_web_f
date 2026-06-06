@@ -1,4 +1,4 @@
-// src/features/auth/services/AuthService.ts
+// src/features/auth/services/firebaseAuth.ts
 
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { auth } from "@/services/firebase";
