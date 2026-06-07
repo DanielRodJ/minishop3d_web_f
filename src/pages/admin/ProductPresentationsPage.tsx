@@ -1,30 +1,31 @@
 // src/pages/admin/ProductPresentationsPage.tsx
 
 // Librerías externas.
+import { PlusIcon } from "@heroicons/react/24/solid";
 import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { PlusIcon } from "@heroicons/react/24/solid";
 
 // Componentes.
+import { DataState } from "@/features/admin/DataState";
 import { FormProductPresentation } from "@/features/admin/components/FormsProductPresentation";
+import { Pagination } from "@/features/admin/components/Pagination";
+import { ProductPresentationsViewPanel } from "@/features/admin/components/ProductPresentationsViewPanel";
 
 // Hooks.
+import { useCatalogos } from "@/features/admin/hooks/catalogos/useCatalogos";
 import {
   getInitialProductoPresentacion,
   useAddProductoPresentacionMutation,
   useUpdateProductoPresentacionMutation
 } from "@/features/admin/hooks/productos/useProductoPresentacionMutations";
-import { useCatalogos } from "@/features/admin/hooks/catalogos/useCatalogos";
 import { useProductoPresentaciones } from "@/features/admin/hooks/productos/useProductoPresentaciones";
+
+// Utils.
+import { mapToSelectOptions } from "@/features/admin/utils/mapToSelectOptions";
 
 // Types.
 import type { UpdateProductoPresentacionCommand } from "@/types/commands/ProductoPresentacionCommands";
 import type { ProductoPresentacionResponse } from "@/types/responses/ProductoPresentacionResponses";
-import { ProductPresentationsViewPanel } from "@/features/admin/components/ProductPresentationsViewPanel";
-
-import { Pagination } from "@/features/admin/components/Pagination";
-import { DataState } from "@/features/admin/DataState";
-import { mapToSelectOptions } from "@/features/admin/utils/mapToSelectOptions";
 
 // método para mapear response a command.
 // preparación de datos para mostrar en formulario.
@@ -65,7 +66,7 @@ export const ProductPresentationsPage = () => {
     productoPresentaciones,
     isLoadingProductoPresentaciones,
     productoPresentacionesError,
-    setPage,
+    setProductoPresentacionesPage,
   } = useProductoPresentaciones(productoIdNumber);
 
   const {
@@ -175,7 +176,7 @@ export const ProductPresentationsPage = () => {
             <Pagination
               pageNumber={productoPresentaciones.pageNumber}
               totalPages={productoPresentaciones.totalPages}
-              onPageChange={setPage}
+              onPageChange={setProductoPresentacionesPage}
             />
           </div>
         )}

@@ -1,26 +1,32 @@
 // src/features/admin/hooks/productos/useProductoPresentaciones.ts
 
-import { useState } from "react";
+// Librerías externas.
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
+// Servicios.
 import { getProductoPresentacionesAsync } from "@/features/admin/services/ApiProducto";
+
+// Errores.
 import { getErrorMessage } from "@/errors/ApiError";
+
+// Types.
 import type { ProductoPresentacionesResponse } from "@/types/responses/ProductoPresentacionResponses";
 
 export const useProductoPresentaciones = (productoId: number | undefined) => {
 
-  const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
+  const [productoPresentacionespage, setProductoPresentacionesPage] = useState(1);
+  const [productoPresentacionesSearch, setProductoPresentacionesSearch] = useState("");
 
   const presentacionesQuery = useQuery<ProductoPresentacionesResponse, Error>({
-    queryKey: ["producto", productoId, "presentaciones-listado", { page, search }],
+    queryKey: ["producto", productoId, "presentaciones-listado", { page: productoPresentacionespage, search: productoPresentacionesSearch }],
     queryFn: async () => {
       if (!productoId) throw new Error("ID de producto no válido");
       
       return await getProductoPresentacionesAsync(productoId, {
-        pageNumber: page,
+        pageNumber: productoPresentacionespage,
         pageSize: 10,
-        searchTerm: search,
+        searchTerm: productoPresentacionesSearch,
         sortBy: "productoId",
         sortDescending: false,
       });
@@ -36,9 +42,9 @@ export const useProductoPresentaciones = (productoId: number | undefined) => {
     isLoadingProductoPresentaciones: presentacionesQuery.isLoading,
     productoPresentacionesError: error ? getErrorMessage(error, "Error al cargar presentaciones") : null,
     refetchProductoPresentaciones: () => presentacionesQuery.refetch(),
-    page,
-    setPage,
-    search,
-    setSearch,
+    productoPresentacionespage,
+    setProductoPresentacionesPage,
+    productoPresentacionesSearch,
+    setProductoPresentacionesSearch,
   };
 };
