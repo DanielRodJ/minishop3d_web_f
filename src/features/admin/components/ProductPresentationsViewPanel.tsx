@@ -1,4 +1,4 @@
-// src/features/admin/componetns/ProductPresentationsViewPanel.tsx
+// src/features/admin/components/ProductPresentationsViewPanel.tsx
 
 // Componentes.
 import { ProductPresentationCard } from "@/features/admin/components/ProductPresentationCard";
@@ -6,13 +6,22 @@ import { ProductPresentationCard } from "@/features/admin/components/ProductPres
 // Types.
 import type { ProductoPresentacionResponse } from "@/types/responses/ProductoPresentacionResponses";
 
+type Layout = "compacto" | "normal" | "amplio";
+
+const gridLayouts: Record<Layout, string> = {
+    compacto: "grid-cols-4",
+    normal: "grid-cols-2",
+    amplio: "grid-cols-1",
+};
+
 interface ProductPresentationsViewPanelProps {
     items: ProductoPresentacionResponse[];
     titulo?: string;
     subtitulo?: string;
     isLoadingProductos?: boolean;
     editable: boolean;
-    onPageChange?: (page: number) => void;
+    layout?: Layout;
+    onEdit?: () => void;
 }
 
 export const ProductPresentationsViewPanel = ({
@@ -20,6 +29,8 @@ export const ProductPresentationsViewPanel = ({
     titulo,
     subtitulo,
     editable = false,
+    layout = "normal",
+    onEdit,
 }: ProductPresentationsViewPanelProps) => {
     return (
         <section className="flex h-full flex-col rounded-md border border-slate-200 bg-slate-50 p-4">
@@ -39,12 +50,13 @@ export const ProductPresentationsViewPanel = ({
                         No hay registros
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1">
+                    <div className={`grid gap-4 ${gridLayouts[layout]}`}>
                         {items.map(pp => (
                             <ProductPresentationCard
                                 key={pp.productoPresentacionId}
                                 productoPresentacion={pp}
                                 editable={editable}
+                                onEdit={onEdit}
                             />
                         ))}
                     </div>
