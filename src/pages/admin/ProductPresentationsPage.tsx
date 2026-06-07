@@ -1,157 +1,131 @@
 // src/pages/admin/ProductPresentationsPage.tsx
 
 // Librerías externas.
-import { useEffect, useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { PlusIcon } from "@heroicons/react/24/solid";
 
 // Componentes.
-import { Spinner } from "@/components/ui/Spinner";
-import { Toast } from "@/components/ui/Toast";
-
 import { FormProductPresentation } from "@/features/admin/components/FormsProductPresentation";
-import { ProductPresentationCard } from "@/features/admin/components/ProductPresentationCard";
 
 // Hooks.
-import { useProducto } from "@/features/admin/hooks/productos/useProducto";
 import {
   getInitialProductoPresentacion,
-  useAddProductoPresentacionForm,
-  useUpdateProductoPresentacionForm
-} from "@/features/admin/hooks/useProductPresentationForm";
-
-// Servicios.
-import {
-  getEscalas,
-  getEstadosProducto,
-  getFilamentos
-} from "@/services/ApiCatalogo";
-
-// Utils.
-import { getErrorMessage } from "@/errors/ApiError";
+  useAddProductoPresentacionMutation,
+  useUpdateProductoPresentacionMutation
+} from "@/features/admin/hooks/productos/useProductoPresentacionMutations";
+import { useCatalogos } from "@/features/admin/hooks/catalogos/useCatalogos";
+import { useProductoPresentaciones } from "@/features/admin/hooks/productos/useProductoPresentaciones";
 
 // Types.
-import type { SelectOption } from "@/components/shared/inputs/Dropdown";
-import type { UpdateProductoPresentacionCommand } from "@/types/ProductoPresentacionCommands";
+import type { UpdateProductoPresentacionCommand } from "@/types/commands/ProductoPresentacionCommands";
 import type { ProductoPresentacionResponse } from "@/types/responses/ProductoPresentacionResponses";
+import { ProductPresentationsViewPanel } from "@/features/admin/components/ProductPresentationsViewPanel";
 
+import { Pagination } from "@/features/admin/components/Pagination";
+import { DataState } from "@/features/admin/DataState";
+import { mapToSelectOptions } from "@/features/admin/utils/mapToSelectOptions";
+
+// método para mapear response a command.
+// preparación de datos para mostrar en formulario.
+const mapProductoPresentacionToCommand = (
+  pp: ProductoPresentacionResponse
+): UpdateProductoPresentacionCommand => ({
+  productoPresentacionId: pp.productoPresentacionId,
+  productoId: pp.productoId,
+  filamentoId: pp.filamentoId,
+  escalaCodigo: pp.escalaCodigo,
+  dimensionX: pp.dimensionX,
+  dimensionY: pp.dimensionY,
+  dimensionZ: pp.dimensionZ,
+  tiempoImpresionMinutos: pp.tiempoImpresionMinutos,
+  cantidadGramosFilamentoUso: pp.cantidadGramosFilamentoUso,
+  estadoProductoPresentacionCodigo: pp.estadoProductoPresentacionCodigo,
+  stock: pp.stock,
+  costoProduccionAdicional: pp.costoProduccionAdicional,
+  precioVenta: pp.precioVenta
+});
+
+// valor inicial para mantener tipado y estado controlado del formulario.
 const EMPTY_UPDATE_PRESENTACION: UpdateProductoPresentacionCommand = {
   productoPresentacionId: 0,
   ...getInitialProductoPresentacion(0)
 };
 
-const mapPresentationToCommand = (
-  presentation: ProductoPresentacionResponse
-): UpdateProductoPresentacionCommand => ({
-  productoPresentacionId: presentation.productoPresentacionId,
-  productoId: presentation.productoId,
-  filamentoId: presentation.filamentoId,
-  escalaCodigo: presentation.escalaCodigo,
-  dimensionX: presentation.dimensionX,
-  dimensionY: presentation.dimensionY,
-  dimensionZ: presentation.dimensionZ,
-  tiempoImpresionMinutos: presentation.tiempoImpresionMinutos,
-  cantidadGramosFilamentoUso: presentation.cantidadGramosFilamentoUso,
-  estadoProductoPresentacionCodigo: presentation.estadoProductoPresentacionCodigo,
-  stock: presentation.stock,
-  costoProduccionAdicional: presentation.costoProduccionAdicional,
-  precioVenta: presentation.precioVenta
-});
-
 export const ProductPresentationsPage = () => {
+  const navigate = useNavigate();
+
+  const [isAddRecordFormOpen, setAddRecordFormOpen] = useState(false);
+  const [selectedPresentation, setSelectedPresentation] = useState<ProductoPresentacionResponse | null>(null);
 
   const { productoId } = useParams();
-  const navigate = useNavigate();
-  const parsedProductoId = Number(productoId);
-
-  const [toast, setToast] = useState<string | null>(null);
-
-  const [isAddOpen, setAddOpen] = useState(false);
-  const [selectedPresentation, setSelectedPresentation] =
-    useState<ProductoPresentacionResponse | null>(null);
+  const productoIdNumber = Number(productoId);
 
   const {
-    producto,
-    isLoadingProducto,
-    productoError,
-    refetchProducto
-  } = useProducto(parsedProductoId);
+    productoPresentaciones,
+    isLoadingProductoPresentaciones,
+    productoPresentacionesError,
+    setPage,
+  } = useProductoPresentaciones(productoIdNumber);
 
-  const escalasQuery = useQuery({
-    queryKey: ["catalogo", "escalas"],
-    queryFn: getEscalas,
-    staleTime: 5 * 60 * 1000,
-  });
+  const {
+    escalas,
+    estadosProducto,
+    filamentos,
+  } = useCatalogos();
 
-  const estadosQuery = useQuery({
-    queryKey: ["catalogo", "estados-producto"],
-    queryFn: getEstadosProducto,
-    staleTime: 5 * 60 * 1000,
-  });
+  // mapeo de opcioens para dropdowns.
+  const escalasOpciones = useMemo(
+    () => mapToSelectOptions(
+      escalas ?? [],
+      escala => escala.codigo,
+      escala => escala.nombre
+    ), [escalas]
+  );
 
-  const filamentosQuery = useQuery({
-    queryKey: ["catalogo", "filamentos"],
-    queryFn: getFilamentos,
-    staleTime: 5 * 60 * 1000,
-  });
+  const estadosOpciones = useMemo(
+    () => mapToSelectOptions(
+      estadosProducto ?? [],
+      estadoProducto => estadoProducto.codigo,
+      estadoProducto => estadoProducto.nombre
+    ), [estadosProducto]
+  );
 
-  const escalaOptions = useMemo<SelectOption[]>(() => {
-    return escalasQuery.data?.map(item => ({
-      value: item.codigo,
-      label: item.nombre
-    })) ?? [];
-  }, [escalasQuery.data]);
+  const filamentosOpciones = useMemo(
+    () => mapToSelectOptions(
+      filamentos ?? [],
+      filamento => filamento.codigo,
+      filamento => filamento.display,
+    ), [filamentos]
+  );
 
-  const estadoOptions = useMemo<SelectOption[]>(() => {
-    return estadosQuery.data?.map(item => ({
-      value: item.codigo,
-      label: item.nombre
-    })) ?? [];
-  }, [estadosQuery.data]);
+  // valores vaciós iniciales del formulario de actualización.
+  const updateInitialData = useMemo(
+    () => {
+      if (!selectedPresentation) return EMPTY_UPDATE_PRESENTACION;
+      return mapProductoPresentacionToCommand(selectedPresentation);
+    }, [selectedPresentation]
+  );
 
-  const filamentoOptions = useMemo<SelectOption[]>(() => {
-    return filamentosQuery.data?.map(item => ({
-      value: item.filamentoId,
-      label: `${item.display} - ${item.color}`
-    })) ?? [];
-  }, [filamentosQuery.data]);
-
-  useEffect(() => {
-    if (filamentosQuery.error) {
-      setToast(getErrorMessage(filamentosQuery.error, "Error al cargar filamentos"));
-      return;
-    }
-
-    if (escalasQuery.error || estadosQuery.error) {
-      setToast(
-        getErrorMessage(escalasQuery.error ?? estadosQuery.error!, "Error al cargar catalogos")
-      );
-    }
-  }, [escalasQuery.error, estadosQuery.error, filamentosQuery.error]);
-
-  const addForm = useAddProductoPresentacionForm({
-    productoId: parsedProductoId,
-    onSuccess: async () => {
-      setAddOpen(false);
-      await refetchProducto();
+  const addProductoPresentacionMutation = useAddProductoPresentacionMutation({
+    // envío de id para llenado de campo productoId.
+    productoId: productoIdNumber,
+    // si la operación es exisota:
+    // cerrar la vetanan de addRecordForm
+    onSuccess: () => {
+      setAddRecordFormOpen(false);
     }
   });
 
-  const updateInitialData = useMemo(() => {
-    if (!selectedPresentation) return EMPTY_UPDATE_PRESENTACION;
-    return mapPresentationToCommand(selectedPresentation);
-  }, [selectedPresentation]);
-
-  const updateForm = useUpdateProductoPresentacionForm({
+  const updateProductoPresentacionMutation = useUpdateProductoPresentacionMutation({
+    // envío de datos iniciales para updateProductoPresentacionMutation
     initialData: updateInitialData,
-    onSuccess: async () => {
+    // si la operación es exitosa:
+    // cambiamos selectedPresentation a null para cerrar la ventana de updateRecordForm.
+    onSuccess: () => {
       setSelectedPresentation(null);
-      await refetchProducto();
     }
   });
-
-  const presentations = producto?.productoPresentaciones ?? [];
 
   return (
     <section className="min-h-full bg-white p-4">
@@ -168,13 +142,13 @@ export const ProductPresentationsPage = () => {
             Presentaciones
           </h1>
           <p className="text-sm text-slate-500">
-            {producto?.nombreProducto ?? "Producto"}
+            Configuración escalas, materiales, stock y precios para cada presentación.
           </p>
         </div>
 
         <button
           type="button"
-          onClick={() => setAddOpen(true)}
+          onClick={() => setAddRecordFormOpen(true)}
           className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-[#612D53] text-white hover:bg-[#4e2342] cursor-pointer"
           aria-label="Añadir presentación"
           title="Añadir presentación"
@@ -183,69 +157,64 @@ export const ProductPresentationsPage = () => {
         </button>
       </div>
 
-      {isLoadingProducto ? (
-        <div className="flex justify-center py-10">
-          <Spinner />
-        </div>
-      ) : productoError ? (
-        <div className="p-4 text-center text-red-600">{productoError}</div>
-      ) : presentations.length === 0 ? (
-        <div className="rounded-md border border-dashed border-slate-300 p-8 text-center text-slate-500">
-          Este producto aun no tiene presentaciones.
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {presentations.map((presentation) => (
-            <ProductPresentationCard
-              key={presentation.productoPresentacionId}
-              productoPresentacion={presentation}
-              editable={true}
-              onEdit={() => setSelectedPresentation(presentation)}
-            />
-          ))}
-        </div>
-      )}
 
-      {isAddOpen && (
+      <DataState
+        isLoading={isLoadingProductoPresentaciones}
+        error={productoPresentacionesError}
+      >
+        {productoPresentaciones && (
+          <div className="space-y-3">
+            <ProductPresentationsViewPanel
+              items={productoPresentaciones.items}
+              editable={true}
+              titulo="Presentaciones registradas"
+              subtitulo={`${productoPresentaciones.totalItems} variantes disponibles`}
+              onEdit={() => console.log("hola")}
+              layout="compacto"
+            />
+            <Pagination
+              pageNumber={productoPresentaciones.pageNumber}
+              totalPages={productoPresentaciones.totalPages}
+              onPageChange={setPage}
+            />
+          </div>
+        )}
+      </DataState>
+
+      {isAddRecordFormOpen && (
         <FormProductPresentation
-          formData={addForm.formData}
-          escalaOptions={escalaOptions}
-          estadoOptions={estadoOptions}
-          filamentoOptions={filamentoOptions}
-          handleChange={addForm.handleChange}
-          handleSelectChange={addForm.handleSelectChange}
-          handleSubmit={addForm.handleSubmit}
-          handleCalculatePrice={addForm.handleCalculatePrice}
-          fieldErrors={addForm.fieldErrors}
-          submitError={addForm.submitError}
-          disabled={addForm.isSubmitting}
-          isCalculating={addForm.isCalculating}
-          onClose={() => setAddOpen(false)}
+          formData={addProductoPresentacionMutation.formData}
+          escalaOptions={escalasOpciones}
+          estadoOptions={estadosOpciones}
+          filamentoOptions={filamentosOpciones}
+          handleChange={addProductoPresentacionMutation.handleChange}
+          handleSelectChange={addProductoPresentacionMutation.handleSelectChange}
+          handleSubmit={addProductoPresentacionMutation.handleSubmit}
+          handleCalculatePrice={addProductoPresentacionMutation.handleCalculatePrice}
+          fieldErrors={addProductoPresentacionMutation.fieldErrors}
+          submitError={addProductoPresentacionMutation.submitError}
+          disabled={addProductoPresentacionMutation.isSubmitting}
+          isCalculating={addProductoPresentacionMutation.isCalculating}
+          onClose={() => setAddRecordFormOpen(false)}
         />
       )}
 
       {selectedPresentation && (
         <FormProductPresentation
-          formData={updateForm.formData}
-          escalaOptions={escalaOptions}
-          estadoOptions={estadoOptions}
-          filamentoOptions={filamentoOptions}
-          handleChange={updateForm.handleChange}
-          handleSelectChange={updateForm.handleSelectChange}
-          handleSubmit={updateForm.handleSubmit}
-          handleCalculatePrice={updateForm.handleCalculatePrice}
-          fieldErrors={updateForm.fieldErrors}
-          submitError={updateForm.submitError}
-          disabled={updateForm.isSubmitting}
-          isCalculating={updateForm.isCalculating}
+          formData={updateProductoPresentacionMutation.formData}
+          escalaOptions={escalasOpciones}
+          estadoOptions={estadosOpciones}
+          filamentoOptions={filamentosOpciones}
+          handleChange={updateProductoPresentacionMutation.handleChange}
+          handleSelectChange={updateProductoPresentacionMutation.handleSelectChange}
+          handleSubmit={updateProductoPresentacionMutation.handleSubmit}
+          handleCalculatePrice={updateProductoPresentacionMutation.handleCalculatePrice}
+          fieldErrors={updateProductoPresentacionMutation.fieldErrors}
+          submitError={updateProductoPresentacionMutation.submitError}
+          disabled={updateProductoPresentacionMutation.isSubmitting}
+          isCalculating={updateProductoPresentacionMutation.isCalculating}
           onClose={() => setSelectedPresentation(null)}
         />
-      )}
-
-      {toast && (
-        <div className="fixed bottom-4 right-4 z-50">
-          <Toast message={toast} onClose={() => setToast(null)} />
-        </div>
       )}
     </section>
   );
