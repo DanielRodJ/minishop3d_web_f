@@ -8,7 +8,8 @@ import {
     FolderPlusIcon,
     DocumentArrowDownIcon,
     QuestionMarkCircleIcon,
-    ArrowPathIcon
+    ArrowPathIcon,
+    PencilSquareIcon
 } from "@heroicons/react/24/solid";
 
 /* =========================================================
@@ -48,6 +49,11 @@ const buttonPresets: Record<string, ButtonPresetConfig> = {
         text: "Añadir",
         variant: "adminButton",
         Icon: FolderPlusIcon
+    },
+    modifyRecord: {
+        text: "Modificar",
+        variant: "adminButton",
+        Icon: PencilSquareIcon
     },
     generateDocument: {
         text: "Descargar",

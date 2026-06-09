@@ -2,6 +2,7 @@
 
 import type { BasePagedResponse } from "@/types/shared/BasePagedResponse";
 import type { ProductoPresentacionResponse } from "@/types/responses/ProductoPresentacionResponses";
+import type { EstadoPublicacion } from "@/types/shared/EstadoPublicacion";
 
 export type ProductoResponse = {
   productoId: number;
@@ -9,6 +10,7 @@ export type ProductoResponse = {
   nombreProducto: string;
   autorNombre?: string;
   fechaLanzamiento: string;
+  estadoPublicacionCodigo?: EstadoPublicacion;
   isDeleted: boolean;
 };
 

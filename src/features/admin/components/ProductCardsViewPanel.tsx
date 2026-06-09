@@ -1,13 +1,14 @@
 // src/features/admin/components/ProductCardsViewPanel.tsx
 
+// Componentes.
+import { ProductCard } from "@/features/admin/components/ProductCard";
 import { ButtonCustom } from "@/components/ui/Buttons";
 
+// Types.
 import type {
   ProductoResponse,
   CantidadesPresentacionesResponse,
 } from "@/types/responses/ProductoResponses";
-
-import { ProductCard } from "@/features/admin/components/ProductCard";
 
 interface ProductCardsViewPanelProps {
   items: ProductoResponse[];
@@ -21,9 +22,17 @@ export const ProductCardsViewPanel = ({
   items,
   cantidadesPresentaciones,
   selectedProductoId,
-  onRefreshProductos,
   onSelectProducto,
+  onRefreshProductos,
 }: ProductCardsViewPanelProps) => {
+
+  const selectedProducto = items.find(
+    (p) => p.productoId === selectedProductoId
+  );
+
+  const esNuevo = !selectedProducto?.estadoPublicacionCodigo
+    || selectedProducto.estadoPublicacionCodigo === "BOR";
+
   return (
     <section className="space-y-4">
       <header className="flex items-center justify-between gap-3">
@@ -31,16 +40,23 @@ export const ProductCardsViewPanel = ({
           <h2 className="text-sm font-semibold text-slate-900">
             Productos disponibles
           </h2>
-
           <p className="text-xs text-slate-500">
-            {cantidadesPresentaciones?.length} productos encontrados
+            {cantidadesPresentaciones?.length ?? 0} productos encontrados
           </p>
         </div>
 
-        <ButtonCustom
-          preset="reloadData"
-          onClick={onRefreshProductos}
-        />
+        <div className="flex gap-2">
+          <ButtonCustom
+            preset="reloadData"
+            onClick={onRefreshProductos}
+          />
+          {selectedProducto && (
+            <ButtonCustom
+              preset={esNuevo ? "addRecord" : "modifyRecord"}
+              onClick={() => console.log("temp")}
+            />
+          )}
+        </div>
       </header>
 
       <div>
@@ -59,15 +75,10 @@ export const ProductCardsViewPanel = ({
                 <ProductCard
                   key={pd.productoId}
                   producto={pd}
-                  isSelected={
-                    selectedProductoId === pd.productoId
-                  }
-                  cantidadPresentaciones={
-                    cantidades?.cantidadTotalPresentaciones
-                  }
-                  cantidadPresentacionesDisponibles={
-                    cantidades?.cantidadPresentacionesEnEstadoDisponible
-                  }
+                  estadoPublicacion={pd.estadoPublicacionCodigo}
+                  cantidadPresentaciones={cantidades?.cantidadTotalPresentaciones}
+                  cantidadPresentacionesDisponibles={cantidades?.cantidadPresentacionesEnEstadoDisponible}
+                  isSelected={selectedProductoId === pd.productoId}
                   onSelect={() => onSelectProducto(pd)}
                 />
               );

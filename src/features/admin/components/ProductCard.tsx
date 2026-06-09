@@ -1,16 +1,14 @@
 // src/features/admin/components/ProductCard.tsx
 
-import {
-  PlusIcon,
-  PencilIcon,
-  CheckCircleIcon,
-} from "@heroicons/react/24/solid";
+// Librerías externas.
+import {CheckCircleIcon} from "@heroicons/react/24/solid";
 
+// Componentes.
 import { Switch } from "@/components/ui/switch";
 
+// Types.
+import type { EstadoPublicacion } from "@/types/shared/EstadoPublicacion";
 import type { ProductoResponse } from "@/types/responses/ProductoResponses";
-
-type EstadoPublicacion = "ACT" | "INA" | "BOR";
 
 interface ProductCardProps {
   producto: ProductoResponse;
@@ -19,7 +17,7 @@ interface ProductCardProps {
   cantidadPresentacionesDisponibles?: number;
   isSelected: boolean;
   onSelect: () => void;
-  onActionClick?: () => void;
+  onChecked?: (estado: boolean) => void;
 }
 
 const ESTADOS = {
@@ -44,9 +42,8 @@ export const ProductCard = ({
   cantidadPresentacionesDisponibles,
   isSelected,
   onSelect,
-  onActionClick,
+  onChecked,
 }: ProductCardProps) => {
-  const Icono = estadoPublicacion ? PencilIcon : PlusIcon;
 
   const mostrarSwitch =
     estadoPublicacion === "ACT" ||
@@ -58,9 +55,8 @@ export const ProductCard = ({
 
   return (
     <article
-      className={`
-        relative rounded-md border p-4 shadow-sm
-        transition hover:border-black
+      className={`relative rounded-md border p-4 shadow-xs
+        transition hover:border-black hover:ring-2
         ${isSelected
           ? "border-black ring-2 ring-black"
           : "border-slate-300"
@@ -68,48 +64,47 @@ export const ProductCard = ({
       `}
     >
       {isSelected && (
-        <CheckCircleIcon
-          className="absolute right-3 top-3 h-5 w-5 text-[#612D53]"
-        />
+        <CheckCircleIcon className="absolute right-2 top-2 h-6 w-6 text-[#612D53]" />
       )}
 
       <button
         type="button"
         onClick={onSelect}
-        className="block w-full cursor-pointer text-left"
+        className="block w-full text-left cursor-pointer"
       >
         {/* TO DO: Reemplazar placeholder por uso de imágenes reales */}
         <div className="mb-3 h-24 rounded bg-slate-100" />
 
-        <div className="space-y-1">
-          <h3 className="pr-8 text-sm font-semibold text-slate-900">
+        <div className="space-y-2">
+          <h3 className="text-sm font-semibold text-slate-900 truncate">
             {producto.nombreProducto}
           </h3>
-
-          <p className="text-xs text-slate-600">
+          <p className="text-xs text-slate-600 truncate">
             Autor: {producto.autorNombre ?? "N/A"}
           </p>
-
-          <div className="flex flex-col gap-1.5 pt-2">
-            <span className="rounded bg-slate-100 px-2 py-1 text-xs text-slate-600">
-              Presentaciones en total:{" "}
-              {cantidadPresentaciones ?? "N/A"}
-            </span>
-
-            <span className="rounded bg-slate-100 px-2 py-1 text-xs text-slate-600">
-              Presentaciones disponibles:{" "}
-              {cantidadPresentacionesDisponibles ?? "N/A"}
-            </span>
+          <div className="space-y-2 pt-2 text-xs text-slate-600">
+            <div className="flex items-center justify-between rounded bg-slate-100 px-2 py-1">
+              <span>Total</span>
+              <span>
+                {cantidadPresentaciones ?? "N/A"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between rounded bg-slate-100 px-2 py-1">
+              <span>Disponibles</span>
+              <span>
+                {cantidadPresentacionesDisponibles ?? "N/A"}
+              </span>
+            </div>
           </div>
         </div>
       </button>
 
-      <div className="mt-3 flex items-center justify-between gap-2 border-t pt-3">
+      <div className="mt-4 flex items-center justify-between gap 2 border-t pt-2" >
         <span
-          className={`text-sm font-medium ${estado?.color ?? "text-slate-500"
-            }`}
+          className={`text-sm font-medium 
+            ${estado?.color ?? "text-slate-500"}`}
         >
-          {estado?.label ?? "Sin estado"}
+          {estado?.label ?? "N/A"}
         </span>
 
         <div className="flex items-center gap-2">
@@ -117,28 +112,9 @@ export const ProductCard = ({
             <Switch
               size="sm"
               checked={estadoPublicacion === "ACT"}
-              disabled
+              onCheckedChange={onChecked}
             />
           )}
-
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onActionClick?.();
-            }}
-            aria-label={
-              estadoPublicacion
-                ? "Editar producto"
-                : "Agregar producto"
-            }
-            className="
-              cursor-pointer rounded-md p-1
-              text-slate-500 hover:bg-slate-100
-            "
-          >
-            <Icono className="h-4 w-4" />
-          </button>
         </div>
       </div>
     </article>
