@@ -7,7 +7,7 @@ import { ErrorMessage } from "@/components/shared/feedback/ErrorMessage";
 import { Dropdown, type SelectOption } from "@/components/shared/inputs/Dropdown";
 import { InputText } from "@/components/shared/inputs/InputText";
 import { InputTextArea } from "@/components/shared/inputs/InputTextArea";
-import type { AddPublicacionCommand } from "@/types/commands/PublicacionCommand";
+import type { AddPublicacionCommand } from "@/types/commands/PublicacionCommands";
 
 type Props = {
   formData: AddPublicacionCommand;

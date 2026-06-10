@@ -8,7 +8,7 @@ import type {
   AddPublicacionCommand,
   UpdateEstadoPublicacionCommand,
   UpdatePublicacionCommand
-} from "@/types/commands/PublicacionCommand";
+} from "@/types/commands/PublicacionCommands";
 
 import type { ProductoResponse } from "@/types/responses/ProductoResponses";
 

@@ -26,7 +26,7 @@ import {
 } from "@/features/admin/utils/formErrorsUtils";
 
 // Types.
-import type { AddPublicacionCommand } from "@/types/commands/PublicacionCommand";
+import type { AddPublicacionCommand } from "@/types/commands/PublicacionCommands";
 import type { ProductosResponse } from "@/types/responses/ProductoResponses";
 
 // campos númericos
