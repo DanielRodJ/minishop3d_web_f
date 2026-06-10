@@ -1,4 +1,4 @@
-// src/features/admin/hooks/usePublicacionForm.ts
+// src/features/admin/hooks/usePublicacionMutations.ts
 
 // Librerías externas.
 import { useState } from "react";
@@ -11,7 +11,10 @@ import { useFormBase } from "@/features/admin/hooks/useFormBase";
 import { addPublicacionSchema } from "@/features/admin/schemas/publicationSchemas";
 
 // Servicios.
-import { addPublicacionAsync } from "@/features/admin/services/apiPublicacion";
+import { 
+  addPublicacionAsync, 
+  updateEstadoPublicacionAync 
+} from "@/features/admin/services/apiPublicacion";
 
 // Utils.
 import { getErrorMessage } from "@/errors/ApiError";
@@ -24,6 +27,7 @@ import {
 
 // Types.
 import type { AddPublicacionCommand } from "@/types/commands/PublicacionCommand";
+import type { ProductosResponse } from "@/types/responses/ProductoResponses";
 
 // campos númericos
 const numericFields = new Set(["productoId"]);
@@ -111,3 +115,31 @@ export const useAddPublicacionMutation = ({
     isSubmitting: addPublicacionMutation.isPending
   };
 };
+
+export const useUpdateEstadoPublicacionMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateEstadoPublicacionAync,
+
+    onSuccess: (productoActualizado) => {
+      queryClient.setQueriesData<ProductosResponse>(
+        {
+          queryKey: ["productos", "lista"],
+        },
+        (oldData) => {
+          if (!oldData) return oldData;
+
+          return {
+            ...oldData,
+            items: oldData.items.map((item) =>
+              item.productoId === productoActualizado.productoId
+                ? productoActualizado
+                : item
+            ),
+          };
+        }
+      );
+    },
+  });
+}

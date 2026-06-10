@@ -17,7 +17,10 @@ interface ProductCardProps {
   cantidadPresentacionesDisponibles?: number;
   isSelected: boolean;
   onSelect: () => void;
-  onChecked?: (estado: boolean) => void;
+  onChecked?: (
+    productoId: number,
+    estado: boolean
+  ) => void;
 }
 
 const ESTADOS = {
@@ -110,9 +113,15 @@ export const ProductCard = ({
         <div className="flex items-center gap-2">
           {mostrarSwitch && (
             <Switch
+            className="cursor-pointer"
               size="sm"
               checked={estadoPublicacion === "ACT"}
-              onCheckedChange={onChecked}
+              onCheckedChange={(checked) =>
+                onChecked?.(
+                  producto.productoId,
+                  checked
+                )
+              }
             />
           )}
         </div>

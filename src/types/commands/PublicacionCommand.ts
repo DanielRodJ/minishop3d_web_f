@@ -1,4 +1,4 @@
-// src/types/commands/PublicacionCommand.ts
+// src/types/commands/PublicacionCommands.ts
 
 export interface AddPublicacionCommand {
   tituloPublicacion: string;
@@ -10,4 +10,9 @@ export interface AddPublicacionCommand {
 
 export interface UpdatePublicacionCommand extends AddPublicacionCommand {
   publicacionId: number;
+}
+
+export interface UpdateEstadoPublicacionCommand {
+  productoId: number;
+  estadoPublicacionCodigo: string;
 }

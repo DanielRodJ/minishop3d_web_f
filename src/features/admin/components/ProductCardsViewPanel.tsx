@@ -16,6 +16,10 @@ interface ProductCardsViewPanelProps {
   selectedProductoId?: number;
   onSelectProducto: (producto: ProductoResponse) => void;
   onRefreshProductos?: () => void;
+  onChecked?: (
+    productoId: number,
+    estado: boolean
+  ) => void;
 }
 
 export const ProductCardsViewPanel = ({
@@ -24,6 +28,7 @@ export const ProductCardsViewPanel = ({
   selectedProductoId,
   onSelectProducto,
   onRefreshProductos,
+  onChecked,
 }: ProductCardsViewPanelProps) => {
 
   const selectedProducto = items.find(
@@ -80,6 +85,7 @@ export const ProductCardsViewPanel = ({
                   cantidadPresentacionesDisponibles={cantidades?.cantidadPresentacionesEnEstadoDisponible}
                   isSelected={selectedProductoId === pd.productoId}
                   onSelect={() => onSelectProducto(pd)}
+                  onChecked={onChecked}
                 />
               );
             })}

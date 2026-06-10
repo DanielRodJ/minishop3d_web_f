@@ -12,7 +12,7 @@ import { DataState } from "@/features/admin/DataState";
 // Hooks.
 import { useProductoPresentaciones } from "@/features/admin/hooks/productos/useProductoPresentaciones";
 import { useProductos } from "@/features/admin/hooks/productos/useProductos";
-import { useAddPublicacionMutation } from "@/features/admin/hooks/publicacion/usePublicacionMutations";
+import { useAddPublicacionMutation, useUpdateEstadoPublicacionMutation } from "@/features/admin/hooks/publicacion/usePublicacionMutations";
 
 // Types.
 import type { ProductoResponse } from "@/types/responses/ProductoResponses";
@@ -37,6 +37,7 @@ export const ListingsManagementPage = () => {
     setProductoPresentacionesPage
   } = useProductoPresentaciones(selectedProducto?.productoId);
 
+
   const addPublicacionMutation = useAddPublicacionMutation({
     // envío de id para llenada de campo productoId.
     productoId: selectedProducto?.productoId ?? 0,
@@ -47,10 +48,24 @@ export const ListingsManagementPage = () => {
     }
   });
 
+  const updateEstadoMutation = useUpdateEstadoPublicacionMutation();
+
   const handleSelectProductoCandidate = (producto: ProductoResponse) => {
     setSelectedProducto(producto);
     addPublicacionMutation.handleSelectChange("productoId", producto.productoId);
     setProductoPresentacionesPage(1);
+  };
+
+  const handleUpdateEstadoPublicacion = (
+    productoId: number,
+    checked: boolean
+  ) => {
+    updateEstadoMutation.mutate({
+      productoId,
+      estadoPublicacionCodigo: checked
+        ? "ACT"
+        : "INA",
+    });
   };
 
   const selectedPresentationId = selectedProducto?.productoId;
@@ -79,6 +94,7 @@ export const ListingsManagementPage = () => {
                 selectedProductoId={selectedPresentationId}
                 onSelectProducto={handleSelectProductoCandidate}
                 onRefreshProductos={refetchProductos}
+                onChecked={handleUpdateEstadoPublicacion}
               />
               <Pagination
                 pageNumber={productos.pageNumber}

@@ -6,8 +6,11 @@ import { api } from "@/services/apiClient";
 // Types.
 import type {
   AddPublicacionCommand,
+  UpdateEstadoPublicacionCommand,
   UpdatePublicacionCommand
 } from "@/types/commands/PublicacionCommand";
+
+import type { ProductoResponse } from "@/types/responses/ProductoResponses";
 
 import type {
   PublicacionIdResponse,
@@ -63,5 +66,15 @@ export const getPublicacionesAsync = (
   return api.request<PublicacionesResponse>(
     api.private(`${BASE_PATH}/publicaciones?${query.toString()}`),
     "Error al obtener publicaciones"
+  );
+};
+
+export const updateEstadoPublicacionAync = (data: UpdateEstadoPublicacionCommand) => {
+  return api.request<ProductoResponse>(
+    api.private(`${BASE_PATH}/actualizar-estado`, {
+      method: "PATCH",
+      body: JSON.stringify(data)
+    }),
+    "Error al actualizar la publicación"
   );
 };
