@@ -15,6 +15,7 @@ interface ProductCardsViewPanelProps {
   cantidadesPresentaciones?: CantidadesPresentacionesResponse | null;
   selectedProductoId?: number;
   onSelectProducto: (producto: ProductoResponse) => void;
+  onOpenForm?: () => void;
   onRefreshProductos?: () => void;
   onChecked?: (
     productoId: number,
@@ -27,6 +28,7 @@ export const ProductCardsViewPanel = ({
   cantidadesPresentaciones,
   selectedProductoId,
   onSelectProducto,
+  onOpenForm,
   onRefreshProductos,
   onChecked,
 }: ProductCardsViewPanelProps) => {
@@ -58,7 +60,7 @@ export const ProductCardsViewPanel = ({
           {selectedProducto && (
             <ButtonCustom
               preset={esNuevo ? "addRecord" : "modifyRecord"}
-              onClick={() => console.log("temp")}
+              onClick={() => onOpenForm?.()}
             />
           )}
         </div>

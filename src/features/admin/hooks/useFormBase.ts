@@ -1,7 +1,10 @@
 // src/features/admin/hooks/useFormBase.ts
 
-import type { FieldErrors } from "@/errors/ApiError";
+// Librerías externas.
 import { useState, type ChangeEvent } from "react";
+
+// Errores.
+import type { FieldErrors } from "@/errors/ApiError";
 
 type UseFormBaseProps<T> = {
     initialState: T;
@@ -36,12 +39,15 @@ export const useFormBase = <T extends object>({
     const handleChange = (
         e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
+        const { name, type } = e.target;
 
-        const { name, value } = e.target;
+        const value = type === "checkbox"
+            ? (e.target as HTMLInputElement).checked
+            : parseFieldValue(name, e.target.value);
 
         setFormData(prev => ({
             ...prev,
-            [name]: parseFieldValue(name, value)
+            [name]: value
         } as T));
 
         clearFieldError(name);
